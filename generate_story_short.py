@@ -11,6 +11,8 @@ import shutil
 
 import numpy as np
 from PIL import Image
+if not hasattr(Image, "ANTIALIAS"):
+    Image.ANTIALIAS = Image.LANCZOS
 
 import edge_tts
 import requests
