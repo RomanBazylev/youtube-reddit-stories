@@ -33,7 +33,8 @@ TARGET_W, TARGET_H = 1080, 1920
 BUILD_DIR = Path("build")
 CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
-MUSIC_PATH = BUILD_DIR / "music.mp3"HISTORY_PATH = BUILD_DIR / "genre_history.json"
+MUSIC_PATH = BUILD_DIR / "music.mp3"
+HISTORY_PATH = BUILD_DIR / "genre_history.json"
 MAX_HISTORY = 8  # remember last N genres to avoid repeats
 # Voice: natural-sounding male English voices (rotated for variety)
 TTS_VOICES = [
