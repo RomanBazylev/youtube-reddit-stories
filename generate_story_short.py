@@ -31,8 +31,8 @@ TARGET_W, TARGET_H = 1080, 1920
 BUILD_DIR = Path("build")
 CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
-MUSIC_PATH = BUILD_DIR / "music.mp3"
-
+MUSIC_PATH = BUILD_DIR / "music.mp3"HISTORY_PATH = BUILD_DIR / "genre_history.json"
+MAX_HISTORY = 8  # remember last N genres to avoid repeats
 # Voice: natural-sounding male English voices (rotated for variety)
 TTS_VOICES = [
     "en-US-AndrewMultilingualNeural",
@@ -121,7 +121,43 @@ PEXELS_QUERIES = [
     "empty room dramatic",
     "sunset silhouette person",
     "stressed person office",
+    "couple arguing",
+    "office meeting tense",
+    "hands shaking nervous",
+    "car driving night rain",
+    "person reading letter shock",
+    "courtroom justice",
 ]
+
+
+# ── Genre deduplication ───────────────────────────────────────────────────
+
+def _load_genre_history() -> list:
+    if HISTORY_PATH.exists():
+        try:
+            return json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def _save_genre_history(history: list) -> None:
+    HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    HISTORY_PATH.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
+
+
+def _pick_unique_genre() -> str:
+    """Pick a genre not recently used."""
+    history = _load_genre_history()
+    available = [g for g in STORY_GENRES if g not in history]
+    if not available:
+        available = STORY_GENRES
+    genre = random.choice(available)
+    history.append(genre)
+    if len(history) > MAX_HISTORY:
+        history = history[-MAX_HISTORY:]
+    _save_genre_history(history)
+    return genre
 
 
 @dataclass
@@ -383,7 +419,7 @@ def call_groq_for_script() -> tuple:
         print("[WARN] GROQ_API_KEY not set — using fallback script")
         return _fallback_script()
 
-    genre = random.choice(STORY_GENRES)
+    genre = _pick_unique_genre()
     hook = random.choice(STORY_HOOKS)
     tone = random.choice(EMOTIONAL_TONES)
 
