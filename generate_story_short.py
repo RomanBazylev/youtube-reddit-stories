@@ -7,6 +7,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 
+import shutil
+
 import numpy as np
 from PIL import Image
 
@@ -31,9 +33,14 @@ CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
 MUSIC_PATH = BUILD_DIR / "music.mp3"
 
-# Voice: deep male English, slightly slower for storytelling atmosphere
-TTS_VOICE = "en-US-GuyNeural"
-TTS_RATE = "+0%"  # Normal pace for dramatic storytelling
+# Voice: natural-sounding male English voices (rotated for variety)
+TTS_VOICES = [
+    "en-US-AndrewMultilingualNeural",
+    "en-US-BrianMultilingualNeural",
+    "en-US-GuyNeural",
+]
+# TTS rate varies slightly per video for freshness
+TTS_RATE_OPTIONS = ["+0%", "+3%", "+5%", "+7%"]
 
 # TTS pronunciation fixes
 TTS_PRONUNCIATION_FIXES = {
@@ -129,17 +136,17 @@ class VideoMetadata:
     tags: List[str]
 
 
+def _clean_build_dir() -> None:
+    """Remove previous build artifacts to save disk space."""
+    if BUILD_DIR.exists():
+        shutil.rmtree(BUILD_DIR, ignore_errors=True)
+        print("  Cleaned previous build directory")
+
+
 def ensure_dirs() -> None:
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
     CLIPS_DIR.mkdir(parents=True, exist_ok=True)
     AUDIO_DIR.mkdir(parents=True, exist_ok=True)
-
-
-FALLBACK_METADATA = VideoMetadata(
-    title="She Found Her Husband's Secret Phone... What She Did Next 😱 #shorts",
-    description="This Reddit story will keep you on the edge of your seat. Stay until the twist!\n\n#reddit #redditstories #shorts #storytime #viral",
-    tags=["reddit", "reddit stories", "storytime", "shorts", "viral", "twist", "drama"],
-)
 
 
 # Filler phrases that make stories feel empty
@@ -199,13 +206,18 @@ def _validate_script(parts: List[ScriptPart]) -> bool:
         r'moment|finally|discovered|revealed|confession|'
         r'secret|stunned|shocked|couldn\'t believe|'
         r'everything changed|never spoke|walked away|'
-        r'to this day|lesson|karma|justice',
+        r'to this day|lesson|karma|justice|'
+        r'noticed|decided|told|found out|knew|said|'
+        r'confronted|admitted|it hit me|at that moment|'
+        r'asked|called|grabbed|opened|showed|'
+        r'remember|started|happened|saw|heard|'
+        r'looked|turned|came|went|left|took',
         re.IGNORECASE,
     )
     narrative_count = sum(1 for p in parts if narrative_markers.search(p.text))
     ratio = narrative_count / len(parts)
-    if ratio < 0.25:
-        print(f"[QUALITY] Rejected: not enough narrative progression ({ratio:.0%}, need >=25%)")
+    if ratio < 0.15:
+        print(f"[QUALITY] Rejected: not enough narrative progression ({ratio:.0%}, need >=15%)")
         return False
 
     # Last part should feel like an ending (reflection, lesson, resolution)
@@ -223,9 +235,9 @@ def _validate_script(parts: List[ScriptPart]) -> bool:
     return True
 
 
-# ── Fallback script ────────────────────────────────────────────────────
-def _fallback_script() -> tuple:
-    parts = [
+# ── Fallback scripts (pool of stories to avoid repeats) ───────────────
+_FALLBACK_POOL = [
+    [
         ScriptPart("My neighbor had been stealing my packages for months, and I finally had proof."),
         ScriptPart("It started when I noticed my Amazon deliveries kept disappearing from my doorstep."),
         ScriptPart("The first time I thought it was a mistake. The second time, I got suspicious."),
@@ -240,13 +252,135 @@ def _fallback_script() -> tuple:
         ScriptPart("I pulled up the security footage on my phone and said maybe we should call the police instead."),
         ScriptPart("Her face went completely white. She never touched my packages again."),
         ScriptPart("She moved out three months later. Karma delivered, even when my packages weren't."),
-    ]
-    return parts, FALLBACK_METADATA
+    ],
+    [
+        ScriptPart("I discovered my roommate had been wearing my clothes to work every single day."),
+        ScriptPart("I noticed my favorite shirts smelled like cologne I didn't own."),
+        ScriptPart("One morning I decided to leave early and hide in the kitchen to watch."),
+        ScriptPart("At seven fifteen, Jake walked out of his room wearing my brand new jacket."),
+        ScriptPart("He stood in front of the mirror, adjusted the collar, and said 'looking good' to himself."),
+        ScriptPart("I confronted him right there. He turned bright red and claimed he thought it was his."),
+        ScriptPart("But then I opened his closet. Empty hangers. Every single piece was mine."),
+        ScriptPart("He had been doing this for four months. My entire wardrobe was in rotation."),
+        ScriptPart("I told him he had two choices: replace everything or I'd tell our landlord about the lease violation."),
+        ScriptPart("He showed up the next day with six shopping bags full of new clothes. For himself."),
+        ScriptPart("Turned out he'd been broke and too embarrassed to admit he couldn't afford clothes."),
+        ScriptPart("I felt bad, honestly. We worked out a deal where he'd do my laundry in exchange."),
+        ScriptPart("He finally got a better job two months later and paid me back for everything."),
+        ScriptPart("We're still roommates. He hasn't touched my closet since."),
+    ],
+    [
+        ScriptPart("My boss fired me on a Friday. By Monday, he was begging me to come back."),
+        ScriptPart("I had worked at that company for three years, building their entire inventory system from scratch."),
+        ScriptPart("He called me into his office and said the company was 'going in a new direction.'"),
+        ScriptPart("I asked if there was a severance package. He laughed and said 'this isn't that kind of company.'"),
+        ScriptPart("I packed my desk, said goodbye to my coworkers, and walked out without a word."),
+        ScriptPart("Saturday morning I got seventeen missed calls. All from the office."),
+        ScriptPart("Turned out nobody else knew the admin password to the system I built."),
+        ScriptPart("Their entire warehouse operation froze. Orders couldn't ship. Clients were furious."),
+        ScriptPart("My boss finally called me himself, practically begging. He offered double my old salary."),
+        ScriptPart("I told him I'd come back as a consultant. Two hundred dollars an hour, minimum forty hours."),
+        ScriptPart("He agreed instantly. I fixed the issue in about twenty minutes."),
+        ScriptPart("Then I handed him a written password recovery guide and my final invoice."),
+        ScriptPart("Eight thousand dollars for one Monday morning. He never said a word."),
+        ScriptPart("I started my own consulting business that week. Best firing of my life."),
+    ],
+    [
+        ScriptPart("I caught my best friend's boyfriend on a dating app, and I had screenshots."),
+        ScriptPart("Sarah and Mike had been together for two years. She thought he was the one."),
+        ScriptPart("I was swiping through an app when his face popped up. Same photos, different name."),
+        ScriptPart("His profile said 'single and ready to mingle.' I almost dropped my phone."),
+        ScriptPart("I took screenshots of everything — his bio, his photos, even his opening messages to other girls."),
+        ScriptPart("I drove to Sarah's apartment that night. She opened the door smiling. That killed me."),
+        ScriptPart("I showed her the screenshots without saying a word. Her face just crumbled."),
+        ScriptPart("She called Mike right there. He denied it, said someone stole his photos."),
+        ScriptPart("So I showed her the messages. He'd been active that same afternoon."),
+        ScriptPart("She told him to come pick up his stuff. He showed up an hour later, furious at me."),
+        ScriptPart("He said I ruined his relationship. I told him he did that all by himself."),
+        ScriptPart("Sarah cried for a week, but she told me finding out then saved her from something worse."),
+        ScriptPart("She met someone amazing six months later. They just got engaged last month."),
+        ScriptPart("Mike still messages her sometimes. She never opens them."),
+    ],
+]
+
+_FALLBACK_METADATA_POOL = [
+    VideoMetadata(
+        title="She Found Her Husband's Secret Phone... What She Did Next 😱 #shorts",
+        description="My neighbor had been stealing my packages for months. I finally set the perfect trap.\nStay until the end — the karma is REAL.\n\n#shorts #reddit #redditstories #storytime #karma #revenge #neighbor #viral #drama #packagethief\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "karma", "revenge", "neighbor", "package thief", "glitter bomb", "caught stealing", "drama", "twist ending"],
+    ),
+    VideoMetadata(
+        title="My Roommate Wore My Clothes for 4 Months... I Set a Trap 👔 #shorts",
+        description="I noticed my shirts smelled like cologne I didn't own. Then I caught him red-handed.\nThis roommate story is absolutely wild.\n\n#shorts #reddit #redditstories #storytime #roommate #caught #drama #viral #roommatenightmare\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "roommate", "caught", "drama", "roommate nightmare", "clothes", "trap", "confrontation"],
+    ),
+    VideoMetadata(
+        title="My Boss Fired Me Friday. Monday He Begged Me Back 💰 #shorts",
+        description="He laughed when I asked about severance. He wasn't laughing on Monday morning.\nBest revenge story you'll hear today.\n\n#shorts #reddit #redditstories #storytime #revenge #workplace #karma #boss #viral #quitmyjob\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "revenge", "karma", "workplace", "boss", "fired", "quit my job", "malicious compliance", "office drama"],
+    ),
+    VideoMetadata(
+        title="I Found My Best Friend's BF on a Dating App 📱 #shorts",
+        description="She thought he was the one. I had the screenshots to prove otherwise.\nSome secrets are too big to keep.\n\n#shorts #reddit #redditstories #storytime #cheating #betrayal #drama #viral #datingapp #relationship\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "cheating", "betrayal", "drama", "dating app", "relationship", "caught cheating", "best friend", "boyfriend"],
+    ),
+]
+
+
+def _fallback_script() -> tuple:
+    idx = random.randrange(len(_FALLBACK_POOL))
+    return list(_FALLBACK_POOL[idx]), _FALLBACK_METADATA_POOL[idx]
+
+
+# ── Core tags that must always be present ──────────────────────────────
+_CORE_TAGS = [
+    "shorts", "reddit", "reddit stories", "storytime", "reddit storytime",
+    "story time", "true story", "viral", "best reddit stories",
+]
+
+_DESCRIPTION_FOOTER = (
+    "\n\nFollow for a new Reddit story every day! 🔔"
+    "\n\n#shorts #reddit #redditstories #storytime #viral #drama #truestory"
+)
+
+
+def _enrich_metadata(meta: VideoMetadata) -> VideoMetadata:
+    """Ensure metadata has enough tags, proper title, and rich description."""
+    # Title: ensure #shorts is present and there's an emoji
+    title = meta.title
+    if "#shorts" not in title.lower():
+        title = title.rstrip() + " #shorts"
+    title = title[:100]
+
+    # Tags: merge with core tags, deduplicate, keep order
+    seen = set()
+    merged_tags = []
+    for tag in list(meta.tags) + _CORE_TAGS:
+        tag_lower = tag.lower().strip()
+        if tag_lower and tag_lower not in seen:
+            seen.add(tag_lower)
+            merged_tags.append(tag.strip())
+    # YouTube allows up to 500 chars of tags total
+    tags = []
+    total_len = 0
+    for tag in merged_tags:
+        if total_len + len(tag) + 1 > 490:
+            break
+        tags.append(tag)
+        total_len += len(tag) + 1
+
+    # Description: add footer if not already rich
+    desc = meta.description.strip()
+    if "follow" not in desc.lower() and "subscribe" not in desc.lower():
+        desc = desc + _DESCRIPTION_FOOTER
+
+    return VideoMetadata(title=title, description=desc, tags=tags)
 
 
 def call_groq_for_script() -> tuple:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
+        print("[WARN] GROQ_API_KEY not set — using fallback script")
         return _fallback_script()
 
     genre = random.choice(STORY_GENRES)
@@ -268,6 +402,12 @@ def call_groq_for_script() -> tuple:
         "Build suspense naturally — each sentence should make the listener NEED to hear the next one. "
         "The ending must deliver: either justice, karma, a twist reveal, an emotional payoff, or a powerful life lesson. "
         "NEVER use filler phrases like 'you won't believe' or 'wait for it'. SHOW, don't tell. "
+        "Use NARRATIVE TRANSITIONS to move the story forward — words and phrases like: "
+        "'but then', 'suddenly', 'turned out', 'realized', 'discovered', 'finally', "
+        "'that's when', 'never expected', 'the truth was', 'everything changed', "
+        "'couldn't believe', 'noticed', 'decided', 'told', 'found out', 'knew', "
+        "'walked away', 'confronted', 'admitted', 'it hit me', 'at that moment'. "
+        "At least a third of your sentences should contain such narrative progression markers. "
         "Respond ONLY with valid JSON, no markdown wrappers or explanations."
     )
 
@@ -291,6 +431,7 @@ STYLE RULES:
 - Use specific details: "My neighbor Karen", "every Tuesday at 3 PM", "a 1997 Honda Civic"
 - Natural dialogue snippets make stories feel alive: He said, "You're fired." I said, "Actually, check your email."
 - NO filler: never say "you won't believe", "wait for it", "this is crazy", "hear me out"
+- Use NARRATIVE TRANSITIONS in at least 30% of lines — words like: "but then", "suddenly", "turned out", "realized", "discovered", "finally", "that's when", "never expected", "couldn't believe", "noticed", "decided", "found out", "knew", "confronted", "admitted". These transitions move the story forward and keep viewers hooked.
 - 14-18 parts total for a 60-90 second story
 - The LAST part must feel like a definitive ending — not a cliffhanger
 
@@ -299,9 +440,9 @@ EXAMPLE OF A BAD ENDING: "And that's my story. Like and subscribe for more!"
 
 Format — strictly JSON:
 {{
-  "title": "Catchy YouTube title with emoji, max 70 chars, includes #shorts",
-  "description": "2-3 line YouTube description with hashtags",
-  "tags": ["reddit", "storytime", "shorts", ...5-8 more relevant tags],
+  "title": "Catchy clickbait YouTube title, max 80 chars. MUST include one emoji and end with #shorts. Use curiosity gap: 'She Found His Secret Phone...' or 'My Boss Fired Me. He Regretted It Monday.' Make viewers NEED to click.",
+  "description": "4-6 line YouTube description. Line 1: a hook that creates curiosity (this shows in search results). Line 2: one-sentence story teaser. Line 3: empty line. Line 4-5: relevant hashtags (start with #shorts #reddit #storytime then add 5-8 story-specific hashtags like #revenge #karma #cheating #workplace #drama #betrayal #twist #confession). Line 6: call to action like 'Follow for daily Reddit stories!'",
+  "tags": ["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", ...8-12 MORE story-specific tags like: "revenge", "karma", "cheating story", "workplace drama", "plot twist", "relationship", "caught cheating", "entitled people", "AITA", "best reddit stories", "reddit readings"],
   "pexels_queries": ["4-6 short English queries for atmospheric/moody stock video clips matching the story mood"],
   "parts": [
     {{ "text": "Story sentence, 12-25 words, vivid and specific" }}
@@ -344,6 +485,7 @@ Format — strictly JSON:
             description=data.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
             tags=data.get("tags", ["reddit", "storytime", "shorts"]),
         )
+        metadata = _enrich_metadata(metadata)
         # Save LLM-generated Pexels queries
         llm_queries = data.get("pexels_queries", [])
         if llm_queries:
@@ -352,9 +494,35 @@ Format — strictly JSON:
 
         if _validate_script(parts):
             return parts, metadata
-        print("[WARN] LLM output failed quality check, using fallback")
+        print("[WARN] LLM output failed quality check, retrying with fresh prompt...")
     except Exception as exc:
-        print(f"[WARN] Groq parse error, using fallback: {exc}")
+        print(f"[WARN] Groq parse error, retrying: {exc}")
+
+    # ── Retry once with a fresh random seed ──
+    body["messages"][1]["content"] = body["messages"][1]["content"] + "\n\nIMPORTANT: Use more narrative transition words like 'realized', 'discovered', 'turned out', 'finally', 'suddenly', 'that's when', 'noticed', 'decided', 'found out'. At least 30% of parts MUST contain such words."
+    body["temperature"] = 1.0
+    try:
+        resp2 = requests.post(url, headers=headers, json=body, timeout=60)
+        resp2.raise_for_status()
+        content2 = resp2.json()["choices"][0]["message"]["content"]
+        content2 = re.sub(r"^```(?:json)?\s*", "", content2.strip())
+        content2 = re.sub(r"\s*```$", "", content2.strip())
+        data2 = json.loads(content2)
+        parts2 = [ScriptPart(p["text"]) for p in data2.get("parts", []) if p.get("text")]
+        metadata2 = VideoMetadata(
+            title=data2.get("title", "")[:100] or "A Story You Won't Forget #shorts",
+            description=data2.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
+            tags=data2.get("tags", ["reddit", "storytime", "shorts"]),
+        )
+        metadata2 = _enrich_metadata(metadata2)
+        llm_queries2 = data2.get("pexels_queries", [])
+        if llm_queries2:
+            _llm_pexels_queries = [q for q in llm_queries2 if isinstance(q, str)][:6]
+        if _validate_script(parts2):
+            return parts2, metadata2
+        print("[WARN] Retry also failed quality check, using fallback")
+    except Exception as exc:
+        print(f"[WARN] Retry failed: {exc}, using fallback")
 
     return _fallback_script()
 
@@ -487,9 +655,6 @@ def download_background_music() -> Optional[Path]:
     if os.getenv("DISABLE_BG_MUSIC") == "1":
         return None
 
-    if MUSIC_PATH.is_file():
-        return MUSIC_PATH
-
     candidate_urls = [
         "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/Its_time_for_adventure/Komiku_-_05_-_Friends.mp3",
         "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Podington_Bear/Daydream/Podington_Bear_-_Daydream.mp3",
@@ -497,6 +662,7 @@ def download_background_music() -> Optional[Path]:
         "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Lobo_Loco/Folkish_things/Lobo_Loco_-_01_-_Acoustic_Dreams_ID_1199.mp3",
     ]
 
+    # Pick a random track each time for variety
     for url in random.sample(candidate_urls, len(candidate_urls)):
         try:
             _download_file(url, MUSIC_PATH)
@@ -517,13 +683,16 @@ def _fix_pronunciation(text: str) -> str:
 
 async def _generate_all_audio(parts: List[ScriptPart]) -> List[Path]:
     """Generate all audio parts in parallel."""
+    voice = random.choice(TTS_VOICES)
+    rate = random.choice(TTS_RATE_OPTIONS)
+    print(f"  TTS voice: {voice}, rate: {rate}")
     audio_paths: List[Path] = []
     tasks = []
     for i, part in enumerate(parts):
         out = AUDIO_DIR / f"part_{i}.mp3"
         audio_paths.append(out)
         tts_text = _fix_pronunciation(part.text)
-        comm = edge_tts.Communicate(tts_text, TTS_VOICE, rate=TTS_RATE)
+        comm = edge_tts.Communicate(tts_text, voice, rate=rate)
         tasks.append(comm.save(str(out)))
     await asyncio.gather(*tasks)
     return audio_paths
@@ -588,29 +757,29 @@ def _make_subtitle(text: str, duration: float) -> list:
     shadow = (
         TextClip(
             text,
-            fontsize=64,
+            fontsize=72,
             color="black",
             font="DejaVu-Sans-Bold",
             method="caption",
-            size=(TARGET_W - 100, None),
+            size=(TARGET_W - 90, None),
             stroke_color="black",
-            stroke_width=5,
+            stroke_width=6,
         )
-        .set_position(("center", 0.72), relative=True)
+        .set_position(("center", 0.70), relative=True)
         .set_duration(duration)
     )
     main_txt = (
         TextClip(
             text,
-            fontsize=64,
+            fontsize=72,
             color="white",
             font="DejaVu-Sans-Bold",
             method="caption",
-            size=(TARGET_W - 100, None),
+            size=(TARGET_W - 90, None),
             stroke_color="black",
             stroke_width=3,
         )
-        .set_position(("center", 0.72), relative=True)
+        .set_position(("center", 0.70), relative=True)
         .set_duration(duration)
     )
     return [shadow, main_txt]
@@ -669,7 +838,7 @@ def build_video(
     audio_tracks = [voice]
     bg = None
     if music_path and music_path.is_file():
-        bg = AudioFileClip(str(music_path)).volumex(0.08)  # Quieter for storytelling
+        bg = AudioFileClip(str(music_path)).volumex(0.13)
         bg = bg.set_duration(total_duration)
         bg = bg.fx(afx.audio_fadeout, min(2.0, total_duration * 0.1))
         audio_tracks.append(bg)
@@ -718,6 +887,7 @@ def _save_metadata(meta: VideoMetadata) -> None:
 
 
 def main() -> None:
+    _clean_build_dir()
     ensure_dirs()
     print("[1/5] Generating story script...")
     parts, metadata = call_groq_for_script()
