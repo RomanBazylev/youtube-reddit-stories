@@ -34,8 +34,6 @@ BUILD_DIR = Path("build")
 CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
 MUSIC_PATH = BUILD_DIR / "music.mp3"
-HISTORY_PATH = BUILD_DIR / "genre_history.json"
-MAX_HISTORY = 8  # remember last N genres to avoid repeats
 # Voice: natural-sounding male English voices (rotated for variety)
 TTS_VOICES = [
     "en-US-AndrewMultilingualNeural",
@@ -113,6 +111,87 @@ EMOTIONAL_TONES = [
     "relatable everyday situation turned absurd",
 ]
 
+# ── Specific diversity pools (character × setting × premise = millions of combos) ──
+
+STORY_CHARACTERS = [
+    "a retired firefighter",
+    "a college freshman",
+    "a single dad working two jobs",
+    "a veterinarian in a small town",
+    "a high school teacher",
+    "a food delivery driver",
+    "a 70-year-old grandmother",
+    "a night shift security guard",
+    "a wedding photographer",
+    "a real estate agent",
+    "a nurse on the night shift",
+    "a first-generation college student",
+    "an Uber driver",
+    "a park ranger",
+    "a stay-at-home mom turned entrepreneur",
+    "a librarian",
+    "a military veteran adjusting to civilian life",
+    "a small restaurant owner",
+    "a tattoo artist",
+    "a foster parent",
+]
+
+STORY_SETTINGS = [
+    "at a summer camp",
+    "during a cross-country road trip",
+    "in a hospital waiting room",
+    "at a family reunion barbecue",
+    "in a small-town diner",
+    "at a storage unit auction",
+    "during a power outage",
+    "on a cruise ship",
+    "at a community garage sale",
+    "in a shared laundry room",
+    "at a dog park",
+    "during a house renovation",
+    "at a 24-hour Walmart at 3 AM",
+    "in a thrift store",
+    "at a funeral reception",
+    "during a neighborhood block party",
+    "at a car dealership",
+    "in an airport during a delay",
+    "at a high school reunion",
+    "at a pawn shop",
+]
+
+STORY_PREMISES = [
+    "The narrator discovers their dog has been visiting a neighbor's house every day",
+    "A package arrives addressed to someone who died 20 years ago",
+    "The narrator recognizes their childhood bully working at a drive-through",
+    "A security camera captures something nobody was supposed to see",
+    "The narrator's identical twin impersonates them for a job interview",
+    "A hidden room is found behind drywall during renovation",
+    "The narrator's Uber driver turns out to be their estranged father",
+    "A handwritten note is found inside a secondhand book",
+    "The new neighbor's WiFi name reveals a disturbing message",
+    "A DNA test kit gift reveals the family's biggest secret",
+    "The narrator catches their landlord entering the apartment while they're at work",
+    "A stranger at a coffee shop leaves a note saying 'I know what you did'",
+    "The narrator discovers their coworker has been living in the office after hours",
+    "An old voicemail is found on a phone bought at a pawn shop",
+    "The narrator finds their own missing person poster from 15 years ago",
+    "A storage unit left by a deceased relative contains something unexpected",
+    "The narrator's Ring doorbell records the same person walking by at 3 AM every night",
+    "A childhood time capsule is opened 20 years later with a shocking item inside",
+    "The narrator discovers their 'online friend' of 5 years lives next door",
+    "An anonymous letter arrives warning the narrator about someone they trust",
+    "The narrator's kid draws a picture of 'the man in the closet'",
+    "A restaurant receipt from a spouse shows a dinner for two on a 'work trip' night",
+    "The narrator finds a second mailbox key on their keyring that fits a PO box they never rented",
+    "A neighbor's tree falls and reveals something buried underneath",
+    "The narrator gets a friend request from someone with their exact name and face",
+    "A hotel room's Bible has handwritten messages from dozens of past guests telling the same warning",
+    "The narrator's car dashcam records something while parked at the office",
+    "A wrong-number text leads to uncovering a scam targeting the narrator's elderly parent",
+    "The narrator discovers their 'new' house still has the previous owner's belongings hidden in the attic",
+    "A lost wallet is returned with extra money and a note inside",
+]
+
 PEXELS_QUERIES = [
     "person thinking alone",
     "dramatic lighting face",
@@ -133,36 +212,6 @@ PEXELS_QUERIES = [
 ]
 
 
-# ── Genre deduplication ───────────────────────────────────────────────────
-
-def _load_genre_history() -> list:
-    if HISTORY_PATH.exists():
-        try:
-            return json.loads(HISTORY_PATH.read_text(encoding="utf-8"))
-        except Exception:
-            pass
-    return []
-
-
-def _save_genre_history(history: list) -> None:
-    HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
-    HISTORY_PATH.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
-
-
-def _pick_unique_genre() -> str:
-    """Pick a genre not recently used."""
-    history = _load_genre_history()
-    available = [g for g in STORY_GENRES if g not in history]
-    if not available:
-        available = STORY_GENRES
-    genre = random.choice(available)
-    history.append(genre)
-    if len(history) > MAX_HISTORY:
-        history = history[-MAX_HISTORY:]
-    _save_genre_history(history)
-    return genre
-
-
 @dataclass
 class ScriptPart:
     text: str
@@ -173,6 +222,81 @@ class VideoMetadata:
     title: str
     description: str
     tags: List[str]
+
+
+# ── YouTube title dedup ────────────────────────────────────────────────────────
+
+_STOP_WORDS = frozenset({
+    'shorts', 'reddit', 'the', 'a', 'my', 'i', 'and', 'to', 'for', 'of',
+    'in', 'on', 'is', 'was', 'her', 'his', 'she', 'he', 'it', 'me',
+})
+
+
+def _title_similarity(a: str, b: str) -> float:
+    """Word-overlap ratio between two titles, ignoring stop words and symbols."""
+    def _norm(t):
+        return set(re.sub(r'[^a-z0-9 ]', ' ', t.lower()).split()) - _STOP_WORDS
+    wa, wb = _norm(a), _norm(b)
+    if not wa or not wb:
+        return 0.0
+    return len(wa & wb) / max(len(wa), len(wb))
+
+
+def get_recent_titles(limit: int = 30) -> list:
+    """Fetch recent video titles from the YouTube channel via API."""
+    client_id = os.getenv("YOUTUBE_CLIENT_ID")
+    client_secret = os.getenv("YOUTUBE_CLIENT_SECRET")
+    refresh_token = os.getenv("YOUTUBE_REFRESH_TOKEN")
+    if not all([client_id, client_secret, refresh_token]):
+        print("[YOUTUBE] Missing OAuth credentials, skipping title check")
+        return []
+    try:
+        token_resp = requests.post(
+            "https://oauth2.googleapis.com/token",
+            data={
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "refresh_token": refresh_token,
+                "grant_type": "refresh_token",
+            },
+            timeout=15,
+        )
+        token_resp.raise_for_status()
+        access_token = token_resp.json()["access_token"]
+        headers = {"Authorization": f"Bearer {access_token}"}
+
+        ch_resp = requests.get(
+            "https://www.googleapis.com/youtube/v3/channels",
+            params={"part": "contentDetails", "mine": "true"},
+            headers=headers,
+            timeout=15,
+        )
+        ch_resp.raise_for_status()
+        items = ch_resp.json().get("items", [])
+        if not items:
+            return []
+        uploads_id = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+        pl_resp = requests.get(
+            "https://www.googleapis.com/youtube/v3/playlistItems",
+            params={
+                "part": "snippet",
+                "playlistId": uploads_id,
+                "maxResults": str(min(limit, 50)),
+            },
+            headers=headers,
+            timeout=15,
+        )
+        pl_resp.raise_for_status()
+        titles = []
+        for item in pl_resp.json().get("items", []):
+            title = item.get("snippet", {}).get("title", "").strip()
+            if title and title.lower() != "private video":
+                titles.append(title)
+        return titles
+    except Exception as exc:
+        print(f"[YOUTUBE] Could not fetch recent titles: {exc}")
+        return []
 
 
 def _clean_build_dir() -> None:
@@ -340,6 +464,67 @@ _FALLBACK_POOL = [
         ScriptPart("She met someone amazing six months later. They just got engaged last month."),
         ScriptPart("Mike still messages her sometimes. She never opens them."),
     ],
+    [
+        ScriptPart("My rescue dog led me to a locked shed behind our new house."),
+        ScriptPart("We adopted Max from a shelter three weeks after moving in."),
+        ScriptPart("Every evening he'd scratch at the back fence and whine toward the old shed."),
+        ScriptPart("I figured it was raccoons. My wife said to just ignore it."),
+        ScriptPart("One Saturday I grabbed bolt cutters and opened the padlock."),
+        ScriptPart("Inside were stacked boxes labeled with dates going back fifteen years."),
+        ScriptPart("Every box held letters, photos, and small wrapped gifts addressed to a girl named Lily."),
+        ScriptPart("I tracked down the previous owner through county records. He was in a nursing home."),
+        ScriptPart("Turned out Lily was his granddaughter. Her parents cut off contact after a family fight."),
+        ScriptPart("He'd been buying her birthday gifts every year, hoping she'd come back."),
+        ScriptPart("I found Lily on social media. She lived two hours away and had no idea."),
+        ScriptPart("She drove down that weekend. The reunion at the nursing home broke everyone in the room."),
+        ScriptPart("She visits him every Sunday now. Max gets extra treats for being the one who started it all."),
+        ScriptPart("Sometimes the best things you find aren't what you were looking for."),
+    ],
+    [
+        ScriptPart("Our family vacation to Mexico turned into a survival story on night two."),
+        ScriptPart("We booked an all-inclusive resort. The photos online looked like paradise."),
+        ScriptPart("When we arrived, the lobby smelled like mildew and half the lights were out."),
+        ScriptPart("Our room had ants in the bathroom and a balcony door that wouldn't lock."),
+        ScriptPart("I complained at the front desk. The manager shrugged and said all rooms were the same."),
+        ScriptPart("That night a tropical storm knocked out power to the entire resort for thirty-six hours."),
+        ScriptPart("No AC, no restaurant, no working phones. Staff disappeared."),
+        ScriptPart("My wife found a group of stranded tourists pooling food in the conference room."),
+        ScriptPart("A retired chef from Chicago organized a meal using whatever the kitchen had left."),
+        ScriptPart("Strangers became friends over canned beans and warm soda by candlelight."),
+        ScriptPart("When power returned, management offered us twenty percent off our next stay."),
+        ScriptPart("I posted a one-star review with photos. It went viral. The resort closed eight months later."),
+        ScriptPart("The Chicago chef and I still meet up once a year. Best friendship from the worst vacation."),
+    ],
+    [
+        ScriptPart("I went to my twenty-year high school reunion and sat next to the kid everyone bullied."),
+        ScriptPart("His name was Derek. In school he wore the same three shirts and ate lunch alone."),
+        ScriptPart("People called him names I won't repeat. I never joined in, but I never stopped it either."),
+        ScriptPart("At the reunion he walked in wearing a tailored suit and a watch worth more than my car."),
+        ScriptPart("He'd founded a cybersecurity company that was just acquired for ninety million dollars."),
+        ScriptPart("The same guys who tormented him were suddenly trying to shake his hand."),
+        ScriptPart("He politely declined every one. Then he sat next to me and said he remembered something."),
+        ScriptPart("In tenth grade I'd left a granola bar on his desk when nobody was looking."),
+        ScriptPart("I'd completely forgotten. He never did."),
+        ScriptPart("He said that one small thing made him believe not everyone was cruel."),
+        ScriptPart("He offered me a job that night. I started two weeks later."),
+        ScriptPart("I went from a cubicle to a corner office because of a granola bar I barely remember."),
+        ScriptPart("You never know which small kindness someone is holding onto for twenty years."),
+    ],
+    [
+        ScriptPart("A hospital mixed up my blood work and told me I had six months to live."),
+        ScriptPart("I was thirty-four, healthy, running half marathons every weekend."),
+        ScriptPart("The doctor sat me down with a look I'll never forget and said it was stage four."),
+        ScriptPart("I drove home in silence. Told my wife. She collapsed on the kitchen floor."),
+        ScriptPart("I quit my job, cashed out my retirement, and took my family to every place we'd dreamed about."),
+        ScriptPart("Paris. Tokyo. A cabin in the Rockies. Three months of pure presence."),
+        ScriptPart("Then a nurse called. She said there'd been a mix-up with another patient's samples."),
+        ScriptPart("I was completely healthy. The results belonged to someone else entirely."),
+        ScriptPart("I sat on the bathroom floor and cried for an hour. Relief, anger, all of it."),
+        ScriptPart("We sued. The hospital settled out of court for an amount I can't disclose."),
+        ScriptPart("But here's the thing. I never went back to my old job or my old life."),
+        ScriptPart("Those three months showed me what actually mattered. I started a nonprofit for patient advocacy."),
+        ScriptPart("The worst phone call of my life turned into the reset I didn't know I needed."),
+    ],
 ]
 
 _FALLBACK_METADATA_POOL = [
@@ -362,6 +547,26 @@ _FALLBACK_METADATA_POOL = [
         title="I Found My Best Friend's BF on a Dating App 📱 #shorts",
         description="She thought he was the one. I had the screenshots to prove otherwise.\nSome secrets are too big to keep.\n\n#shorts #reddit #redditstories #storytime #cheating #betrayal #drama #viral #datingapp #relationship\n\nFollow for a new Reddit story every day! 🔔",
         tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "cheating", "betrayal", "drama", "dating app", "relationship", "caught cheating", "best friend", "boyfriend"],
+    ),
+    VideoMetadata(
+        title="My Rescue Dog Led Me to a Shed Full of Secrets 🐶 #shorts",
+        description="He kept scratching at the fence every night. What was inside changed two families forever.\nSometimes the best discoveries find you.\n\n#shorts #reddit #redditstories #storytime #rescuedog #family #secrets #viral #heartwarming #reunion\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "rescue dog", "family reunion", "heartwarming", "secrets", "adopted dog", "wholesome"],
+    ),
+    VideoMetadata(
+        title="Our Dream Vacation Turned Into a Nightmare ⛈️ #shorts",
+        description="The resort looked perfect online. Then a storm knocked out everything.\nWhat happened next was something we never expected.\n\n#shorts #reddit #redditstories #storytime #vacation #travel #resort #viral #nightmare #storm\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "vacation", "travel", "resort", "storm", "nightmare", "survival"],
+    ),
+    VideoMetadata(
+        title="The Kid Everyone Bullied Showed Up to Our Reunion a Millionaire 💼 #shorts",
+        description="He wore the same three shirts in high school. Twenty years later he walked in wearing success.\nOne small act of kindness changed my life.\n\n#shorts #reddit #redditstories #storytime #reunion #bully #karma #viral #success #kindness\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "reunion", "bully", "karma", "success", "kindness", "millionaire"],
+    ),
+    VideoMetadata(
+        title="The Hospital Said I Had 6 Months. They Were Wrong 🏥 #shorts",
+        description="I quit my job, spent everything, and said goodbye. Then the phone rang.\nThe mix-up that changed my entire life.\n\n#shorts #reddit #redditstories #storytime #hospital #medical #mixup #viral #lifelesson #secondchance\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "hospital", "medical", "misdiagnosis", "second chance", "life lesson"],
     ),
 ]
 
@@ -416,15 +621,18 @@ def _enrich_metadata(meta: VideoMetadata) -> VideoMetadata:
     return VideoMetadata(title=title, description=desc, tags=tags)
 
 
-def call_groq_for_script() -> tuple:
+def call_groq_for_script(recent_titles: list = None) -> tuple:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         print("[WARN] GROQ_API_KEY not set — using fallback script")
         return _fallback_script()
 
-    genre = _pick_unique_genre()
+    genre = random.choice(STORY_GENRES)
     hook = random.choice(STORY_HOOKS)
     tone = random.choice(EMOTIONAL_TONES)
+    character = random.choice(STORY_CHARACTERS)
+    setting = random.choice(STORY_SETTINGS)
+    premise = random.choice(STORY_PREMISES)
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -454,8 +662,16 @@ def call_groq_for_script() -> tuple:
 
 STORY PARAMETERS:
 - Genre: {genre}
+- Narrator: {character}
+- Setting: {setting}
+- Premise: {premise}
 - Hook style: {hook}
 - Emotional tone: {tone}
+
+YOUR STORY MUST:
+- Feature the narrator described above as the main character
+- Take place in or around the setting described above
+- Be built around the specific premise above — this is the core event of your story
 
 CRITICAL STORY REQUIREMENTS:
 1. OPENING (parts 1-2): A gripping hook that immediately creates curiosity or tension. Drop the listener right into the situation.
@@ -489,6 +705,9 @@ Format — strictly JSON:
 }}"""
 
     print(f"  Genre: {genre}")
+    print(f"  Character: {character}")
+    print(f"  Setting: {setting}")
+    print(f"  Premise: {premise}")
     print(f"  Hook: {hook}")
     print(f"  Tone: {tone}")
 
@@ -532,8 +751,17 @@ Format — strictly JSON:
             _llm_pexels_queries = [q for q in llm_queries if isinstance(q, str)][:6]
 
         if _validate_script(parts):
-            return parts, metadata
-        print("[WARN] LLM output failed quality check, retrying with fresh prompt...")
+            if recent_titles:
+                for rt in recent_titles:
+                    if _title_similarity(metadata.title, rt) > 0.5:
+                        print(f"[WARN] Title too similar to '{rt}', retrying...")
+                        break
+                else:
+                    return parts, metadata
+            else:
+                return parts, metadata
+        else:
+            print("[WARN] LLM output failed quality check, retrying with fresh prompt...")
     except Exception as exc:
         print(f"[WARN] Groq parse error, retrying: {exc}")
 
@@ -558,7 +786,15 @@ Format — strictly JSON:
         if llm_queries2:
             _llm_pexels_queries = [q for q in llm_queries2 if isinstance(q, str)][:6]
         if _validate_script(parts2):
-            return parts2, metadata2
+            if recent_titles:
+                for rt in recent_titles:
+                    if _title_similarity(metadata2.title, rt) > 0.5:
+                        print(f"[WARN] Retry title also too similar to '{rt}', using fallback")
+                        break
+                else:
+                    return parts2, metadata2
+            else:
+                return parts2, metadata2
         print("[WARN] Retry also failed quality check, using fallback")
     except Exception as exc:
         print(f"[WARN] Retry failed: {exc}, using fallback")
@@ -928,8 +1164,10 @@ def _save_metadata(meta: VideoMetadata) -> None:
 def main() -> None:
     _clean_build_dir()
     ensure_dirs()
+    recent_titles = get_recent_titles()
+    print(f"  Found {len(recent_titles)} recent titles on channel")
     print("[1/5] Generating story script...")
-    parts, metadata = call_groq_for_script()
+    parts, metadata = call_groq_for_script(recent_titles=recent_titles)
     print(f"  Script: {len(parts)} parts")
     print(f"  Title: {metadata.title}")
     total_words = 0
