@@ -947,12 +947,22 @@ def download_background_music() -> Optional[Path]:
     return None
 
 
+# Words that must only match as whole words (not inside "million", "bill", etc.)
+_WHOLE_WORD_FIXES = {
+    "SO", "MIL", "FIL", "SIL", "BIL", "OP", "GF", "BF", "DM", "PM",
+    "NTA", "YTA", "ESH", "IRL",
+}
+
+
 # ── TTS (edge-tts, per-part) ──────────────────────────────────────────
 def _fix_pronunciation(text: str) -> str:
     """Replace hard-to-pronounce abbreviations with spoken equivalents."""
     result = text
     for word, replacement in TTS_PRONUNCIATION_FIXES.items():
-        result = re.sub(re.escape(word), replacement, result, flags=re.IGNORECASE)
+        if word in _WHOLE_WORD_FIXES:
+            result = re.sub(r'\b' + re.escape(word) + r'\b', replacement, result, flags=re.IGNORECASE)
+        else:
+            result = re.sub(re.escape(word), replacement, result, flags=re.IGNORECASE)
     return result
 
 
