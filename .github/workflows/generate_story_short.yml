@@ -64,4 +64,5 @@ jobs:
           path: |
             build/output_story_short.mp4
             build/metadata.json
+          retention-days: 1
           if-no-files-found: warn
