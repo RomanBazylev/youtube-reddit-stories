@@ -34,6 +34,8 @@ BUILD_DIR = Path("build")
 CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
 MUSIC_PATH = BUILD_DIR / "music.mp3"
+TITLE_HISTORY_PATH = Path("title_history.json")
+MAX_TITLE_HISTORY = 40  # remember last N titles to avoid repeats
 # Voice: natural-sounding male English voices (rotated for variety)
 TTS_VOICES = [
     "en-US-AndrewMultilingualNeural",
@@ -571,9 +573,47 @@ _FALLBACK_METADATA_POOL = [
 ]
 
 
-def _fallback_script() -> tuple:
+def _fallback_script(recent_titles: list = None) -> tuple:
+    """Pick a fallback script, avoiding titles already on the channel."""
+    all_titles = list(recent_titles or []) + _load_title_history()
+    # Try each story in random order, skip if title already used
+    order = list(range(len(_FALLBACK_POOL)))
+    random.shuffle(order)
+    for idx in order:
+        meta = _FALLBACK_METADATA_POOL[idx]
+        if all_titles and any(_title_similarity(meta.title, t) > 0.5 for t in all_titles):
+            continue
+        _save_title_to_history(meta.title)
+        return list(_FALLBACK_POOL[idx]), meta
+    # All fallbacks used — pick random but randomize the title emoji to reduce exact-match dupes
     idx = random.randrange(len(_FALLBACK_POOL))
-    return list(_FALLBACK_POOL[idx]), _FALLBACK_METADATA_POOL[idx]
+    meta = _FALLBACK_METADATA_POOL[idx]
+    emoji_pool = ["😱", "🔥", "💀", "😤", "🤯", "💔", "⚡", "👀", "🚨", "📱", "🏠", "💰"]
+    # Strip existing emoji and add a new random one
+    clean_title = re.sub(r'[\U0001f300-\U0001f9ff]', '', meta.title).strip()
+    new_title = f"{clean_title} {random.choice(emoji_pool)} #shorts"[:100]
+    new_meta = VideoMetadata(title=new_title, description=meta.description, tags=meta.tags)
+    _save_title_to_history(new_meta.title)
+    return list(_FALLBACK_POOL[idx]), new_meta
+
+
+def _load_title_history() -> list:
+    """Load locally saved title history."""
+    if TITLE_HISTORY_PATH.is_file():
+        try:
+            return json.loads(TITLE_HISTORY_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def _save_title_to_history(title: str) -> None:
+    """Append title to local history and trim to MAX_TITLE_HISTORY."""
+    history = _load_title_history()
+    history.append(title)
+    if len(history) > MAX_TITLE_HISTORY:
+        history = history[-MAX_TITLE_HISTORY:]
+    TITLE_HISTORY_PATH.write_text(json.dumps(history, ensure_ascii=False), encoding="utf-8")
 
 
 # ── Core tags that must always be present ──────────────────────────────
@@ -625,7 +665,7 @@ def call_groq_for_script(recent_titles: list = None) -> tuple:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         print("[WARN] GROQ_API_KEY not set — using fallback script")
-        return _fallback_script()
+        return _fallback_script(recent_titles)
 
     genre = random.choice(STORY_GENRES)
     hook = random.choice(STORY_HOOKS)
@@ -730,7 +770,7 @@ Format — strictly JSON:
             resp.raise_for_status()
         except Exception as exc2:
             print(f"[WARN] Groq API attempt 2 failed: {exc2}, using fallback")
-            return _fallback_script()
+            return _fallback_script(recent_titles)
 
     try:
         content = resp.json()["choices"][0]["message"]["content"]
@@ -751,14 +791,12 @@ Format — strictly JSON:
             _llm_pexels_queries = [q for q in llm_queries if isinstance(q, str)][:6]
 
         if _validate_script(parts):
-            if recent_titles:
-                for rt in recent_titles:
-                    if _title_similarity(metadata.title, rt) > 0.5:
-                        print(f"[WARN] Title too similar to '{rt}', retrying...")
-                        break
-                else:
-                    return parts, metadata
+            all_titles = list(recent_titles or []) + _load_title_history()
+            is_dupe = any(_title_similarity(metadata.title, t) > 0.5 for t in all_titles)
+            if is_dupe:
+                print(f"[WARN] Title too similar to existing, retrying...")
             else:
+                _save_title_to_history(metadata.title)
                 return parts, metadata
         else:
             print("[WARN] LLM output failed quality check, retrying with fresh prompt...")
@@ -786,20 +824,18 @@ Format — strictly JSON:
         if llm_queries2:
             _llm_pexels_queries = [q for q in llm_queries2 if isinstance(q, str)][:6]
         if _validate_script(parts2):
-            if recent_titles:
-                for rt in recent_titles:
-                    if _title_similarity(metadata2.title, rt) > 0.5:
-                        print(f"[WARN] Retry title also too similar to '{rt}', using fallback")
-                        break
-                else:
-                    return parts2, metadata2
+            all_titles2 = list(recent_titles or []) + _load_title_history()
+            is_dupe2 = any(_title_similarity(metadata2.title, t) > 0.5 for t in all_titles2)
+            if is_dupe2:
+                print(f"[WARN] Retry title also too similar, using fallback")
             else:
+                _save_title_to_history(metadata2.title)
                 return parts2, metadata2
         print("[WARN] Retry also failed quality check, using fallback")
     except Exception as exc:
         print(f"[WARN] Retry failed: {exc}, using fallback")
 
-    return _fallback_script()
+    return _fallback_script(recent_titles)
 
 
 # Global for LLM-generated Pexels queries

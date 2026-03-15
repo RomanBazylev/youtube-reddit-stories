@@ -3,3 +3,5 @@
 build/
 *.mp4
 *.mp3
+*.json
+.env

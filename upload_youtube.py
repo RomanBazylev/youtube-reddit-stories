@@ -87,7 +87,13 @@ def upload_video() -> str:
 
     # Get access token
     print("  Obtaining access token...")
-    access_token = _get_access_token(client_id, client_secret, refresh_token)
+    try:
+        access_token = _get_access_token(client_id, client_secret, refresh_token)
+    except Exception as exc:
+        print(f"[ERROR] Token refresh failed: {exc}")
+        print("  Hint: 400 Bad Request usually means YOUTUBE_REFRESH_TOKEN is expired.")
+        print("  Regenerate it via OAuth Playground with youtube.upload scope.")
+        return ""
 
     # Build video resource metadata
     body = {
@@ -131,6 +137,10 @@ def upload_video() -> str:
     print(f"  Uploading {video_size / 1024 / 1024:.1f} MB...")
     for attempt in range(1, MAX_UPLOAD_RETRIES + 1):
         try:
+            # Re-obtain token before retry in case it expired during a long upload
+            if attempt > 1:
+                print("  Re-obtaining access token...")
+                access_token = _get_access_token(client_id, client_secret, refresh_token)
             upload_resp = requests.put(
                 upload_url,
                 headers={
