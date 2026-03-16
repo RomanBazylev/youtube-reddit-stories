@@ -224,6 +224,7 @@ class VideoMetadata:
     title: str
     description: str
     tags: List[str]
+    topic: str = ""
 
 
 # ── YouTube title dedup ────────────────────────────────────────────────────────
@@ -667,7 +668,12 @@ def call_groq_for_script(recent_titles: list = None) -> tuple:
         print("[WARN] GROQ_API_KEY not set — using fallback script")
         return _fallback_script(recent_titles)
 
-    genre = random.choice(STORY_GENRES)
+    from analytics import get_topic_weights
+    weights = get_topic_weights(STORY_GENRES)
+    if weights:
+        genre = random.choices(STORY_GENRES, weights=weights, k=1)[0]
+    else:
+        genre = random.choice(STORY_GENRES)
     hook = random.choice(STORY_HOOKS)
     tone = random.choice(EMOTIONAL_TONES)
     character = random.choice(STORY_CHARACTERS)
@@ -782,6 +788,7 @@ Format — strictly JSON:
             title=data.get("title", "")[:100] or "A Story You Won't Forget #shorts",
             description=data.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
             tags=data.get("tags", ["reddit", "storytime", "shorts"]),
+            topic=genre,
         )
         metadata = _enrich_metadata(metadata)
         # Save LLM-generated Pexels queries
@@ -818,6 +825,7 @@ Format — strictly JSON:
             title=data2.get("title", "")[:100] or "A Story You Won't Forget #shorts",
             description=data2.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
             tags=data2.get("tags", ["reddit", "storytime", "shorts"]),
+            topic=genre,
         )
         metadata2 = _enrich_metadata(metadata2)
         llm_queries2 = data2.get("pexels_queries", [])
@@ -1201,7 +1209,7 @@ def _save_metadata(meta: VideoMetadata) -> None:
     meta_path = BUILD_DIR / "metadata.json"
     meta_path.write_text(
         json.dumps(
-            {"title": meta.title, "description": meta.description, "tags": meta.tags},
+            {"title": meta.title, "description": meta.description, "tags": meta.tags, "topic": meta.topic},
             ensure_ascii=False,
             indent=2,
         ),
