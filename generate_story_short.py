@@ -227,6 +227,13 @@ class VideoMetadata:
     topic: str = ""
 
 
+@dataclass
+class WordTiming:
+    text: str
+    offset: float
+    duration: float
+
+
 # ── YouTube title dedup ────────────────────────────────────────────────────────
 
 _STOP_WORDS = frozenset({
@@ -1013,25 +1020,51 @@ def _fix_pronunciation(text: str) -> str:
     return result
 
 
-async def _generate_all_audio(parts: List[ScriptPart]) -> List[Path]:
-    """Generate all audio parts in parallel."""
+async def _generate_part_audio(
+    text: str, voice: str, rate: str, out_path: Path,
+) -> List[WordTiming]:
+    """Generate TTS audio and capture per-word timestamps."""
+    comm = edge_tts.Communicate(text, voice, rate=rate)
+    word_timings: List[WordTiming] = []
+    audio_chunks = bytearray()
+
+    async for chunk in comm.stream():
+        if chunk["type"] == "audio":
+            audio_chunks.extend(chunk["data"])
+        elif chunk["type"] == "WordBoundary":
+            word_timings.append(WordTiming(
+                text=chunk["text"],
+                offset=chunk["offset"] / 10_000_000,
+                duration=chunk["duration"] / 10_000_000,
+            ))
+
+    with out_path.open("wb") as f:
+        f.write(audio_chunks)
+    return word_timings
+
+
+async def _generate_all_audio(
+    parts: List[ScriptPart],
+) -> tuple:
+    """Generate per-part TTS audio with word timings. Returns (paths, timings_per_part)."""
     voice = random.choice(TTS_VOICES)
     rate = random.choice(TTS_RATE_OPTIONS)
     print(f"  TTS voice: {voice}, rate: {rate}")
     audio_paths: List[Path] = []
-    tasks = []
+    all_timings: List[List[WordTiming]] = []
+
     for i, part in enumerate(parts):
         out = AUDIO_DIR / f"part_{i}.mp3"
         audio_paths.append(out)
         tts_text = _fix_pronunciation(part.text)
-        comm = edge_tts.Communicate(tts_text, voice, rate=rate)
-        tasks.append(comm.save(str(out)))
-    await asyncio.gather(*tasks)
-    return audio_paths
+        timings = await _generate_part_audio(tts_text, voice, rate, out)
+        all_timings.append(timings)
+
+    return audio_paths, all_timings
 
 
-def build_tts_per_part(parts: List[ScriptPart]) -> List[Path]:
-    """Generate a separate mp3 for each sentence — perfect sync."""
+def build_tts_per_part(parts: List[ScriptPart]) -> tuple:
+    """Generate a separate mp3 for each sentence with word timings."""
     return asyncio.run(_generate_all_audio(parts))
 
 
@@ -1084,37 +1117,80 @@ def _apply_ken_burns(clip, duration: float):
     return clip.fl(make_frame)
 
 
-def _make_subtitle(text: str, duration: float) -> list:
-    """Subtitle with outline — readable on any background."""
-    shadow = (
-        TextClip(
-            text,
-            fontsize=72,
-            color="black",
-            font="DejaVu-Sans-Bold",
-            method="caption",
-            size=(TARGET_W - 90, None),
-            stroke_color="black",
-            stroke_width=6,
-        )
-        .set_position(("center", 0.70), relative=True)
-        .set_duration(duration)
-    )
-    main_txt = (
-        TextClip(
-            text,
-            fontsize=72,
-            color="white",
-            font="DejaVu-Sans-Bold",
-            method="caption",
-            size=(TARGET_W - 90, None),
-            stroke_color="black",
-            stroke_width=3,
-        )
-        .set_position(("center", 0.70), relative=True)
-        .set_duration(duration)
-    )
-    return [shadow, main_txt]
+def _make_karaoke_subtitle(
+    word_timings: List[WordTiming], duration: float, is_hook: bool = False,
+) -> list:
+    """Karaoke-style subtitles: groups of 3 words appear in sync with speech."""
+    if not word_timings:
+        return []
+
+    CHUNK_SIZE = 3
+    chunks = []
+    for i in range(0, len(word_timings), CHUNK_SIZE):
+        chunks.append(word_timings[i:i + CHUNK_SIZE])
+
+    layers = []
+    for ci, chunk in enumerate(chunks):
+        chunk_start = chunk[0].offset
+        if ci + 1 < len(chunks):
+            chunk_end = chunks[ci + 1][0].offset
+        else:
+            chunk_end = min(chunk[-1].offset + chunk[-1].duration + 0.3, duration)
+        chunk_dur = chunk_end - chunk_start
+        if chunk_dur <= 0:
+            continue
+
+        full_text = " ".join(w.text for w in chunk)
+        active_color = "#FF4444" if is_hook else "yellow"
+        active_fontsize = 88 if is_hook else 72
+        fade_fontsize = 80 if is_hook else 72
+
+        speak_end = chunk[-1].offset + chunk[-1].duration
+        speak_dur = speak_end - chunk_start
+        if speak_dur > 0:
+            try:
+                yellow_txt = (
+                    TextClip(
+                        full_text,
+                        fontsize=active_fontsize,
+                        color=active_color,
+                        font="DejaVu-Sans-Bold",
+                        method="caption",
+                        size=(TARGET_W - 100, None),
+                        stroke_color="black",
+                        stroke_width=4,
+                    )
+                    .set_position(("center", 0.75), relative=True)
+                    .set_start(chunk_start)
+                    .set_duration(min(speak_dur, chunk_dur))
+                )
+                layers.append(yellow_txt)
+            except Exception as exc:
+                print(f"[WARN] Karaoke TextClip failed: {exc}")
+
+        remaining = chunk_end - speak_end
+        if remaining > 0.05:
+            try:
+                white_txt = (
+                    TextClip(
+                        full_text,
+                        fontsize=fade_fontsize,
+                        color="white",
+                        font="DejaVu-Sans-Bold",
+                        method="caption",
+                        size=(TARGET_W - 100, None),
+                        stroke_color="black",
+                        stroke_width=3,
+                    )
+                    .set_position(("center", 0.75), relative=True)
+                    .set_start(speak_end)
+                    .set_duration(remaining)
+                )
+                layers.append(white_txt)
+            except Exception:
+                pass
+
+    return layers
 
 
 def build_video(
@@ -1122,6 +1198,7 @@ def build_video(
     clip_paths: List[Path],
     audio_parts: List[Path],
     music_path: Optional[Path],
+    word_timings: List[List[WordTiming]],
 ) -> Path:
     if not clip_paths:
         raise RuntimeError("No video clips downloaded. Provide PEXELS_API_KEY or PIXABAY_API_KEY.")
@@ -1151,7 +1228,8 @@ def build_video(
         fitted = _fit_clip_to_frame(clip, dur)
         fitted = _apply_ken_burns(fitted, dur)
 
-        subtitle_layers = _make_subtitle(part.text, dur)
+        timings = word_timings[i] if i < len(word_timings) else []
+        subtitle_layers = _make_karaoke_subtitle(timings, dur, is_hook=(i == 0))
 
         composed = CompositeVideoClip(
             [fitted] + subtitle_layers,
@@ -1241,18 +1319,19 @@ def main() -> None:
     clip_paths += download_pixabay_clips()
     print(f"  Downloaded {len(clip_paths)} clips")
 
-    print("[3/5] Generating TTS audio (edge-tts, per-part)...")
-    audio_parts = build_tts_per_part(parts)
+    print("[3/5] Generating TTS audio (edge-tts, per-part with word timings)...")
+    audio_parts, word_timings = build_tts_per_part(parts)
     for i, ap in enumerate(audio_parts):
         a = AudioFileClip(str(ap))
-        print(f"  Part {i+1}: {a.duration:.1f}s")
+        wt_count = len(word_timings[i]) if i < len(word_timings) else 0
+        print(f"  Part {i+1}: {a.duration:.1f}s, {wt_count} word timings")
         a.close()
 
     print("[4/5] Downloading background music...")
     music_path = download_background_music()
 
     print("[5/5] Building final video...")
-    output = build_video(parts, clip_paths, audio_parts, music_path)
+    output = build_video(parts, clip_paths, audio_parts, music_path, word_timings)
     print(f"Done! Video saved to: {output}")
 
 
