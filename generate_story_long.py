@@ -157,7 +157,7 @@ def _fix_pronunciation(text: str) -> str:
     return result
 
 
-def _groq_call(messages: list, temperature: float = 0.85, max_tokens: int = 8192) -> Optional[str]:
+def _groq_call(messages: list, temperature: float = 0.85, max_tokens: int = 8192, json_mode: bool = False) -> Optional[str]:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         return None
@@ -168,6 +168,8 @@ def _groq_call(messages: list, temperature: float = 0.85, max_tokens: int = 8192
         "temperature": temperature,
         "max_tokens": max_tokens,
     }
+    if json_mode:
+        body["response_format"] = {"type": "json_object"}
     for attempt in range(1, 3):
         try:
             r = requests.post(GROQ_URL, headers=headers, json=body, timeout=90)
@@ -192,6 +194,59 @@ def _save_title_history(titles: list[str]):
     TITLE_HISTORY_PATH.write_text(
         json.dumps(titles[-MAX_TITLE_HISTORY:], ensure_ascii=False), encoding="utf-8"
     )
+
+
+def _parse_llm_json(raw: str) -> Optional[dict]:
+    """Robustly parse JSON from LLM output, handling common quirks."""
+    import ast
+
+    # Strip markdown code fences
+    text = re.sub(r"^```(?:json)?\s*", "", raw.strip())
+    text = re.sub(r"\s*```$", "", text.strip())
+
+    # Extract the outermost { ... } to drop any preamble / postamble text
+    start = text.find("{")
+    end = text.rfind("}")
+    if start != -1 and end > start:
+        text = text[start:end + 1]
+
+    # Attempt 1: direct json.loads
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt 2: fix control characters inside string values
+    cleaned = re.sub(r'[\x00-\x1f\x7f]', lambda m: f'\\u{ord(m.group()):04x}', text)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt 3: ast.literal_eval (handles single-quoted Python dicts)
+    try:
+        result = ast.literal_eval(cleaned)
+        if isinstance(result, dict):
+            return result
+    except (ValueError, SyntaxError):
+        pass
+
+    # Attempt 4: fix single quotes → double quotes for keys/values
+    fixed = cleaned.replace("'", '"')
+    try:
+        return json.loads(fixed)
+    except json.JSONDecodeError:
+        pass
+
+    # Attempt 5: fix unquoted keys  {title: "value"} → {"title": "value"}
+    fixed2 = re.sub(r'(?<=[{,])\s*(\w+)\s*:', r' "\1":', cleaned)
+    try:
+        return json.loads(fixed2)
+    except json.JSONDecodeError:
+        pass
+
+    print(f"[WARN] All JSON parse attempts failed. First 300 chars: {raw[:300]}")
+    return None
 
 
 # ── Script Generation ────────────────────────────────────────────────
@@ -236,28 +291,22 @@ FORMAT (strict JSON):
 }}"""},
     ]
 
-    content = _groq_call(messages, temperature=0.9, max_tokens=8192)
+    content = _groq_call(messages, temperature=0.9, max_tokens=8192, json_mode=True)
     if not content:
         return None
-    try:
-        content = re.sub(r"^```(?:json)?\s*", "", content.strip())
-        content = re.sub(r"\s*```$", "", content.strip())
-        # LLM often puts literal newlines/tabs inside JSON string values
-        try:
-            data = json.loads(content)
-        except json.JSONDecodeError:
-            content = re.sub(r'[\x00-\x1f\x7f]', lambda m: f'\\u{ord(m.group()):04x}', content)
-            data = json.loads(content)
-        script = data.get("script", "")
-        wc = len(script.split())
-        print(f"[SCRIPT] {wc} words, {story_count} stories, theme: {theme}")
-        if wc < 500:
-            print("[WARN] Script too short")
-            return None
-        return data
-    except Exception as exc:
-        print(f"[WARN] Parse failed: {exc}")
+    data = _parse_llm_json(content)
+    if not data:
         return None
+    script = data.get("script", "")
+    if isinstance(script, list):
+        script = "\n".join(str(s) for s in script)
+        data["script"] = script
+    wc = len(script.split())
+    print(f"[SCRIPT] {wc} words, {story_count} stories, theme: {theme}")
+    if wc < 500:
+        print("[WARN] Script too short")
+        return None
+    return data
 
 
 # ── TTS ───────────────────────────────────────────────────────────────
