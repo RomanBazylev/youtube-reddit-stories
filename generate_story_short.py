@@ -1024,7 +1024,7 @@ async def _generate_part_audio(
     text: str, voice: str, rate: str, out_path: Path,
 ) -> List[WordTiming]:
     """Generate TTS audio and capture per-word timestamps."""
-    comm = edge_tts.Communicate(text, voice, rate=rate)
+    comm = edge_tts.Communicate(text, voice, rate=rate, boundary="WordBoundary")
     word_timings: List[WordTiming] = []
     audio_chunks = bytearray()
 
