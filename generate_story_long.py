@@ -266,32 +266,38 @@ def generate_compilation_script() -> Optional[dict]:
             "- Include specific details: names (fake), ages, locations, amounts.\n"
             "- NO generic filler like 'you won't believe' or 'this is crazy'.\n"
             "- Write in first person or narrator perspective.\n"
-            "- ONLY valid JSON, no markdown.\n"
+            "- Respond with ONLY a JSON object. No markdown, no commentary.\n"
         )},
         {"role": "user", "content": f"""Write a YouTube compilation video script: "{story_count} Insane Reddit Stories About {theme.title()}"
 
-The video is 8-12 minutes long (~1500-2000 words total).
+This is an 8-12 minute video. The script MUST be 1500-2000 words long.
 
-STRUCTURE:
-1. INTRO (3-4 sentences): Hook the viewer. Tease what's coming. Ask them to subscribe.
-2. STORIES ({story_count} stories, each 300-400 words):
+CRITICAL: The "script" field must contain AT LEAST 1500 words. This is a LONG video, not a short.
+If the script is under 1000 words, the video cannot be produced.
+
+STRUCTURE (write ALL of these sections in full):
+1. INTRO (4-5 sentences): Hook the viewer. Tease what's coming. Ask them to subscribe.
+2. STORIES ({story_count} stories, each 300-400 words — this is IMPORTANT, do NOT write less):
    - Each story starts with "Story number X..." transition
    - Characters to use: {', '.join(chars[:story_count])}
-   - Each story has: hook → setup → escalation → twist → resolution
+   - Each story MUST have all of these beats: hook (2-3 sentences) → detailed setup (4-5 sentences) → escalation with dialogue (5-6 sentences) → twist (2-3 sentences) → resolution and aftermath (3-4 sentences)
    - Include Reddit-style details: subreddit names, upvote counts, throwaway accounts
-3. OUTRO (2-3 sentences): Wrap up. Ask viewers which story was wildest. Subscribe CTA.
+   - Include specific names, ages, dollar amounts, locations
+   - Use direct quotes and dialogue between characters
+3. OUTRO (3-4 sentences): Wrap up. Ask viewers which story was wildest. Subscribe CTA.
 
-FORMAT (strict JSON):
-{{
-  "title": "Engaging title, max 90 chars, with emoji",
-  "description": "5-8 line description with hashtags",
-  "tags": ["reddit", "storytime", ...15 more relevant tags],
-  "pexels_queries": ["6-8 English queries for background footage"],
-  "script": "Full narration text. Each sentence on its own line. Include story transitions."
-}}"""},
+REMEMBER: Each story needs 300-400 words. {story_count} stories = {story_count * 350} words minimum for stories alone.
+Plus intro and outro = at least 1500 words total.
+
+Return a JSON object with these exact keys:
+- "title": string, engaging title max 90 chars with emoji
+- "description": string, 5-8 lines with hashtags
+- "tags": array of 15-20 strings
+- "pexels_queries": array of 6-8 English search queries for footage
+- "script": ONE STRING with the full narration (1500-2000 words), sentences separated by newlines. NOT an array."""},
     ]
 
-    content = _groq_call(messages, temperature=0.9, max_tokens=8192, json_mode=True)
+    content = _groq_call(messages, temperature=0.9, max_tokens=16384, json_mode=True)
     if not content:
         return None
     data = _parse_llm_json(content)
@@ -303,9 +309,11 @@ FORMAT (strict JSON):
         data["script"] = script
     wc = len(script.split())
     print(f"[SCRIPT] {wc} words, {story_count} stories, theme: {theme}")
-    if wc < 500:
-        print("[WARN] Script too short")
+    if wc < 300:
+        print("[WARN] Script too short (< 300 words), skipping")
         return None
+    if wc < 800:
+        print(f"[WARN] Script shorter than ideal ({wc} words), but usable")
     return data
 
 
