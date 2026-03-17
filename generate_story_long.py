@@ -261,10 +261,9 @@ def generate_compilation_script() -> Optional[dict]:
             "Your style: dramatic, engaging, conversational — like telling stories around a campfire.\n\n"
             "RULES:\n"
             "- Each sentence: max 15 words (for TTS narration).\n"
-            "- Use transitions between stories: 'But wait, story number two is even crazier...'\n"
-            "- Each story needs: setup, escalation, climax, resolution.\n"
-            "- Include specific details: names (fake), ages, locations, amounts.\n"
-            "- NO generic filler like 'you won't believe' or 'this is crazy'.\n"
+            "- Include specific details: names (fake), ages, locations, dollar amounts.\n"
+            "- Use vivid dialogue: 'She looked at me and said: You have no idea what you just did.'\n"
+            "- NO generic filler: 'you won't believe', 'this is crazy', 'trust me'.\n"
             "- Write in first person or narrator perspective.\n"
             "- Respond with ONLY a JSON object. No markdown, no commentary.\n"
         )},
@@ -273,21 +272,23 @@ def generate_compilation_script() -> Optional[dict]:
 This is an 8-12 minute video. The script MUST be 1500-2000 words long.
 
 CRITICAL: The "script" field must contain AT LEAST 1500 words. This is a LONG video, not a short.
-If the script is under 1000 words, the video cannot be produced.
+If the script is under 1000 words, the video CANNOT be produced and will be rejected.
 
-STRUCTURE (write ALL of these sections in full):
-1. INTRO (4-5 sentences): Hook the viewer. Tease what's coming. Ask them to subscribe.
-2. STORIES ({story_count} stories, each 300-400 words — this is IMPORTANT, do NOT write less):
-   - Each story starts with "Story number X..." transition
-   - Characters to use: {', '.join(chars[:story_count])}
-   - Each story MUST have all of these beats: hook (2-3 sentences) → detailed setup (4-5 sentences) → escalation with dialogue (5-6 sentences) → twist (2-3 sentences) → resolution and aftermath (3-4 sentences)
-   - Include Reddit-style details: subreddit names, upvote counts, throwaway accounts
-   - Include specific names, ages, dollar amounts, locations
-   - Use direct quotes and dialogue between characters
-3. OUTRO (3-4 sentences): Wrap up. Ask viewers which story was wildest. Subscribe CTA.
+STRUCTURE (write ALL of these sections in full, do NOT skip any):
+1. INTRO (50-70 words): Hook the viewer. Tease what's coming. Ask them to subscribe.
+2. STORIES ({story_count} stories, each 300-400 words — this is CRITICAL):
+   Each story MUST follow this exact structure:
+   - TRANSITION (1-2 sentences): "Story number X takes us to..." or "But wait, story number two is even wilder..."
+   - HOOK (2-3 sentences, ~40 words): Set up who the character is. Example: "Marcus, 34, was a quiet accountant in Portland. He had never been in trouble in his life. But one Thursday afternoon, everything changed."
+   - SETUP (4-5 sentences, ~70 words): Describe the situation in detail. Include the subreddit, throwaway account name. What was the normal routine?
+   - ESCALATION (5-7 sentences, ~100 words): Things go wrong. Include dialogue between characters. Direct quotes. Tension builds.
+   - TWIST (2-3 sentences, ~50 words): The unexpected turn. The moment everything flips.
+   - RESOLUTION (3-4 sentences, ~60 words): What happened after. The aftermath. Upvote count, community reaction.
+   Characters to use: {', '.join(chars[:story_count])}
+3. OUTRO (50-70 words): Recap the wildest moments. Ask which story was craziest. Subscribe CTA.
 
-REMEMBER: Each story needs 300-400 words. {story_count} stories = {story_count * 350} words minimum for stories alone.
-Plus intro and outro = at least 1500 words total.
+WORD COUNT MATH: Introduction (~60 words) + {story_count} stories x 350 words (~{story_count * 350} words) + Outro (~60 words) = ~{story_count * 350 + 120} words total.
+You MUST hit at least 1500 words. Count carefully.
 
 Return a JSON object with these exact keys:
 - "title": string, engaging title max 90 chars with emoji
