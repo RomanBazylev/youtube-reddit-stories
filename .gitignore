@@ -3,5 +3,9 @@
 build/
 *.mp4
 *.mp3
-*.json
 .env
+
+# Ignore JSON except tracked data files
+*.json
+!performance_log.json
+!title_history.json
