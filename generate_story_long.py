@@ -323,7 +323,7 @@ async def _generate_tts(text: str, output_path: Path) -> list[dict]:
     voice = random.choice(TTS_VOICES)
     rate = random.choice(TTS_RATE_OPTIONS)
     tts_text = _fix_pronunciation(text)
-    comm = edge_tts.Communicate(tts_text, voice, rate=rate)
+    comm = edge_tts.Communicate(tts_text, voice, rate=rate, boundary="WordBoundary")
     word_events = []
     with open(output_path, "wb") as f:
         async for chunk in comm.stream():
