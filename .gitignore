@@ -9,3 +9,4 @@ build/
 *.json
 !performance_log.json
 !title_history.json
+!used_stories.json

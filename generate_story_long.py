@@ -26,7 +26,9 @@ AUDIO_PATH = BUILD_DIR / "voiceover.mp3"
 MUSIC_PATH = BUILD_DIR / "music.mp3"
 OUTPUT_PATH = BUILD_DIR / "output_story_long.mp4"
 TITLE_HISTORY_PATH = Path("title_history.json")
+USED_STORIES_PATH = Path("used_stories.json")
 MAX_TITLE_HISTORY = 40
+MAX_USED_STORIES = 500
 
 TARGET_W, TARGET_H = 1280, 720
 FPS = 30
@@ -126,6 +128,89 @@ _CORE_TAGS = [
 
 TOKEN_URL = "https://oauth2.googleapis.com/token"
 UPLOAD_URL = "https://www.googleapis.com/upload/youtube/v3/videos"
+
+# ── Reddit story subreddits for unique content ────────────────────────
+REDDIT_SUBREDDITS = [
+    "tifu", "AmItheAsshole", "MaliciousCompliance", "pettyrevenge",
+    "ProRevenge", "entitledparents", "IDontWorkHereLady",
+    "TalesFromRetail", "TalesFromYourServer", "relationship_advice",
+    "confessions", "TrueOffMyChest", "NuclearRevenge",
+    "neighborsfromhell", "BestofRedditorUpdates",
+]
+
+REDDIT_USER_AGENT = "Mozilla/5.0 (compatible; StoryBot/1.0)"
+
+
+def _load_used_stories() -> list:
+    if USED_STORIES_PATH.is_file():
+        try:
+            return json.loads(USED_STORIES_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def _save_used_story(post_id: str) -> None:
+    used = _load_used_stories()
+    used.append(post_id)
+    if len(used) > MAX_USED_STORIES:
+        used = used[-MAX_USED_STORIES:]
+    USED_STORIES_PATH.write_text(json.dumps(used, ensure_ascii=False), encoding="utf-8")
+
+
+def fetch_reddit_stories(count: int = 5) -> list[str]:
+    """
+    Fetch multiple real Reddit stories for compilation use.
+    Returns list of premise strings (title + body preview).
+    """
+    used_ids = set(_load_used_stories())
+    subreddits = list(REDDIT_SUBREDDITS)
+    random.shuffle(subreddits)
+    premises = []
+
+    for sub in subreddits:
+        if len(premises) >= count:
+            break
+        for time_filter in ["week", "month", "year"]:
+            if len(premises) >= count:
+                break
+            url = f"https://www.reddit.com/r/{sub}/top/.json?t={time_filter}&limit=50"
+            try:
+                resp = requests.get(
+                    url,
+                    headers={"User-Agent": REDDIT_USER_AGENT},
+                    timeout=15,
+                )
+                if resp.status_code == 429:
+                    print(f"[REDDIT] Rate limited on r/{sub}, trying next...")
+                    break
+                resp.raise_for_status()
+                data = resp.json()
+                posts = data.get("data", {}).get("children", [])
+                for post in posts:
+                    if len(premises) >= count:
+                        break
+                    p = post.get("data", {})
+                    post_id = p.get("id", "")
+                    selftext = (p.get("selftext") or "").strip()
+                    title = (p.get("title") or "").strip()
+                    if post_id in used_ids:
+                        continue
+                    if len(selftext) < 200:
+                        continue
+                    if p.get("removed_by_category") or selftext in ("[removed]", "[deleted]"):
+                        continue
+                    body_preview = selftext[:500].rsplit(" ", 1)[0]
+                    premises.append(f"{title}. {body_preview}")
+                    _save_used_story(post_id)
+                    used_ids.add(post_id)
+                    print(f"[REDDIT] Got story from r/{sub}: {title[:60]}...")
+            except Exception as exc:
+                print(f"[REDDIT] Failed r/{sub}/{time_filter}: {exc}")
+                continue
+
+    print(f"[REDDIT] Fetched {len(premises)} unique stories for compilation")
+    return premises
 
 
 # ── Helpers ────────────────────────────────────────────────────────────
@@ -255,6 +340,17 @@ def generate_compilation_script() -> Optional[dict]:
     chars = random.sample(STORY_CHARACTERS, min(5, len(STORY_CHARACTERS)))
     story_count = random.choice([3, 4, 5])
 
+    # Fetch real Reddit stories as inspiration for compilation
+    reddit_premises = fetch_reddit_stories(count=story_count)
+    if reddit_premises:
+        inspiration_block = "\n\nREAL REDDIT STORIES FOR INSPIRATION (rewrite these as fresh stories with different names/details — do NOT copy directly):\n"
+        for i, premise in enumerate(reddit_premises, 1):
+            inspiration_block += f"\nStory {i} inspiration: {premise[:400]}\n"
+        print(f"  Using {len(reddit_premises)} Reddit stories as inspiration")
+    else:
+        inspiration_block = ""
+        print("  No Reddit stories available, using LLM creativity only")
+
     messages = [
         {"role": "system", "content": (
             "You are a top-tier Reddit storyteller narrating a YouTube compilation video. "
@@ -268,6 +364,7 @@ def generate_compilation_script() -> Optional[dict]:
             "- Respond with ONLY a JSON object. No markdown, no commentary.\n"
         )},
         {"role": "user", "content": f"""Write a YouTube compilation video script: "{story_count} Insane Reddit Stories About {theme.title()}"
+{inspiration_block}
 
 This is an 8-12 minute video. The script MUST be 1500-2000 words long.
 

@@ -35,7 +35,9 @@ CLIPS_DIR = BUILD_DIR / "clips"
 AUDIO_DIR = BUILD_DIR / "audio_parts"
 MUSIC_PATH = BUILD_DIR / "music.mp3"
 TITLE_HISTORY_PATH = Path("title_history.json")
+USED_STORIES_PATH = Path("used_stories.json")
 MAX_TITLE_HISTORY = 40  # remember last N titles to avoid repeats
+MAX_USED_STORIES = 500  # remember last N Reddit post IDs to avoid repeats
 # Voice: natural-sounding male English voices (rotated for variety)
 TTS_VOICES = [
     "en-US-AndrewMultilingualNeural",
@@ -212,6 +214,91 @@ PEXELS_QUERIES = [
     "person reading letter shock",
     "courtroom justice",
 ]
+
+# ── Reddit story subreddits for infinite unique premises ───────────────
+REDDIT_SUBREDDITS = [
+    "tifu", "AmItheAsshole", "MaliciousCompliance", "pettyrevenge",
+    "ProRevenge", "entitledparents", "IDontWorkHereLady",
+    "TalesFromRetail", "TalesFromYourServer", "relationship_advice",
+    "confessions", "TrueOffMyChest", "NuclearRevenge",
+    "neighborsfromhell", "BestofRedditorUpdates",
+]
+
+REDDIT_USER_AGENT = "Mozilla/5.0 (compatible; StoryBot/1.0)"
+
+
+def _load_used_stories() -> list:
+    """Load list of previously used Reddit post IDs."""
+    if USED_STORIES_PATH.is_file():
+        try:
+            return json.loads(USED_STORIES_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def _save_used_story(post_id: str) -> None:
+    """Append Reddit post ID to used list and trim."""
+    used = _load_used_stories()
+    used.append(post_id)
+    if len(used) > MAX_USED_STORIES:
+        used = used[-MAX_USED_STORIES:]
+    USED_STORIES_PATH.write_text(json.dumps(used, ensure_ascii=False), encoding="utf-8")
+
+
+def fetch_reddit_premise() -> Optional[str]:
+    """
+    Fetch a real Reddit story from a random story subreddit.
+    Returns a premise string (title + first ~300 chars of selftext),
+    or None if all attempts fail.
+    """
+    used_ids = set(_load_used_stories())
+    subreddits = list(REDDIT_SUBREDDITS)
+    random.shuffle(subreddits)
+
+    for sub in subreddits[:5]:  # try up to 5 subreddits
+        for time_filter in ["week", "month", "year"]:
+            url = f"https://www.reddit.com/r/{sub}/top/.json?t={time_filter}&limit=50"
+            try:
+                resp = requests.get(
+                    url,
+                    headers={"User-Agent": REDDIT_USER_AGENT},
+                    timeout=15,
+                )
+                if resp.status_code == 429:
+                    print(f"[REDDIT] Rate limited on r/{sub}, trying next...")
+                    break
+                resp.raise_for_status()
+                data = resp.json()
+                posts = data.get("data", {}).get("children", [])
+
+                for post in posts:
+                    p = post.get("data", {})
+                    post_id = p.get("id", "")
+                    selftext = (p.get("selftext") or "").strip()
+                    title = (p.get("title") or "").strip()
+
+                    # Skip: already used, too short, removed, or not a story
+                    if post_id in used_ids:
+                        continue
+                    if len(selftext) < 200:
+                        continue
+                    if p.get("removed_by_category") or selftext == "[removed]" or selftext == "[deleted]":
+                        continue
+
+                    # Extract premise: title + truncated body
+                    body_preview = selftext[:500].rsplit(" ", 1)[0]  # cut at word boundary
+                    premise = f"{title}. {body_preview}"
+                    _save_used_story(post_id)
+                    print(f"[REDDIT] Got story from r/{sub}: {title[:80]}...")
+                    return premise
+
+            except Exception as exc:
+                print(f"[REDDIT] Failed r/{sub}/{time_filter}: {exc}")
+                continue
+
+    print("[REDDIT] All subreddits exhausted, falling back to static premises")
+    return None
 
 
 @dataclass
@@ -685,7 +772,15 @@ def call_groq_for_script(recent_titles: list = None) -> tuple:
     tone = random.choice(EMOTIONAL_TONES)
     character = random.choice(STORY_CHARACTERS)
     setting = random.choice(STORY_SETTINGS)
-    premise = random.choice(STORY_PREMISES)
+
+    # Try Reddit for a unique real premise; fall back to static list
+    reddit_premise = fetch_reddit_premise()
+    if reddit_premise:
+        premise = reddit_premise
+        print(f"  Using Reddit premise: {premise[:100]}...")
+    else:
+        premise = random.choice(STORY_PREMISES)
+        print(f"  Using static premise: {premise[:100]}...")
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {
@@ -717,14 +812,15 @@ STORY PARAMETERS:
 - Genre: {genre}
 - Narrator: {character}
 - Setting: {setting}
-- Premise: {premise}
+- Premise/Inspiration: {premise}
 - Hook style: {hook}
 - Emotional tone: {tone}
 
 YOUR STORY MUST:
+- Be INSPIRED by the premise above — rewrite it as a fresh, original story with different names, details, and your own creative spin
 - Feature the narrator described above as the main character
 - Take place in or around the setting described above
-- Be built around the specific premise above — this is the core event of your story
+- NEVER copy text directly from the premise — adapt and transform it into something new
 
 CRITICAL STORY REQUIREMENTS:
 1. OPENING (parts 1-2): A gripping hook that immediately creates curiosity or tension. Drop the listener right into the situation.
