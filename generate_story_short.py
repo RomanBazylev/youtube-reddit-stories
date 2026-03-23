@@ -622,6 +622,266 @@ _FALLBACK_POOL = [
         ScriptPart("Those three months showed me what actually mattered. I started a nonprofit for patient advocacy."),
         ScriptPart("The worst phone call of my life turned into the reset I didn't know I needed."),
     ],
+    # ── Stories 9-25: expanded fallback pool ──
+    [
+        ScriptPart("My landlord tried to evict me for having a cat. I didn't have a cat."),
+        ScriptPart("The notice showed up on a Tuesday, taped to my door with a blurry photo of a tabby."),
+        ScriptPart("I knocked on his door and explained I was allergic to cats and had never owned one."),
+        ScriptPart("He pointed at the photo and said the camera doesn't lie."),
+        ScriptPart("So I checked my Ring camera. Turns out his own cat had been sneaking into my apartment through a vent."),
+        ScriptPart("I showed him the footage. His cat, Mr. Whiskers, lounging on my couch at two in the afternoon."),
+        ScriptPart("He went pale. Then he tried to say it didn't matter whose cat it was."),
+        ScriptPart("I called the housing authority the next morning with the footage and the eviction notice."),
+        ScriptPart("Turned out he'd been pulling this scam on three other tenants to break leases early."),
+        ScriptPart("He wanted to renovate and raise rents. The authorities fined him twelve thousand dollars."),
+        ScriptPart("I got six months free rent as part of the settlement."),
+        ScriptPart("Mr. Whiskers still visits sometimes. I bought him a little bed by the vent."),
+        ScriptPart("My landlord sold the building. The new owner actually fixed the heating."),
+    ],
+    [
+        ScriptPart("I accidentally sent a complaint about my boss to my boss."),
+        ScriptPart("I was venting to my friend Lisa about how our manager Dave micromanaged every email."),
+        ScriptPart("I typed out three paragraphs about his passive-aggressive meeting notes and his breath."),
+        ScriptPart("Hit send. Then saw the name at the top. Dave, not Lisa. My stomach dropped."),
+        ScriptPart("I tried to recall the message but Outlook said it had already been read."),
+        ScriptPart("I sat at my desk for forty-five minutes waiting for the call. It never came."),
+        ScriptPart("Instead, Dave walked over at lunch and said he wanted to talk privately."),
+        ScriptPart("I followed him to the conference room convinced I was about to be fired."),
+        ScriptPart("He closed the door, sat down, and said I was right about everything."),
+        ScriptPart("He admitted he'd been stressed about his own boss micromanaging him the same way."),
+        ScriptPart("He asked me to be honest about what else the team needed. I was stunned."),
+        ScriptPart("That conversation changed our entire department. He loosened up, trusted us more."),
+        ScriptPart("He got promoted six months later and recommended me to replace him."),
+        ScriptPart("The worst email I ever sent became the best career move I ever made."),
+    ],
+    [
+        ScriptPart("My daughter's teacher called me in for a meeting about a drawing my kid made."),
+        ScriptPart("They showed me the picture. It was a person standing in fire with the caption 'Daddy's work.'"),
+        ScriptPart("The principal looked at me like I was under investigation."),
+        ScriptPart("I asked my daughter about it that night. She said it was exactly what she saw."),
+        ScriptPart("I'm a firefighter. She drew me at work. Fighting a fire. Like I do every week."),
+        ScriptPart("I brought my work ID and a photo of me in gear to the follow-up meeting."),
+        ScriptPart("The principal's face turned red. The teacher was already apologizing before I sat down."),
+        ScriptPart("They had almost called child services over a six-year-old's art project."),
+        ScriptPart("My daughter asked me the next day if she could draw me rescuing a cat instead."),
+        ScriptPart("I told her she could draw whatever she wanted. She drew me as a superhero."),
+        ScriptPart("I framed that picture and put it in my locker at the station."),
+        ScriptPart("The guys at work thought it was the funniest thing they'd heard all year."),
+        ScriptPart("My daughter's next parent-teacher conference was a lot smoother."),
+    ],
+    [
+        ScriptPart("I tipped a waitress a hundred dollars and got the strangest letter a week later."),
+        ScriptPart("It was a Tuesday night at a diner off the highway. She looked exhausted."),
+        ScriptPart("She got my order wrong twice, apologized both times, and I could see she'd been crying."),
+        ScriptPart("I left a hundred on a fifteen-dollar check and wrote 'hope tomorrow is better' on the receipt."),
+        ScriptPart("A week later an envelope showed up at the restaurant addressed to 'the Tuesday night man.'"),
+        ScriptPart("Inside was a letter from the waitress. Her name was Maria."),
+        ScriptPart("She wrote that she'd been working doubles because her car broke down and she needed it for her kid's chemo appointments."),
+        ScriptPart("That tip covered the final repair payment. Her son made it to treatment on time."),
+        ScriptPart("She said she almost quit that night before I walked in."),
+        ScriptPart("I went back to the diner the next week. She hugged me before I could sit down."),
+        ScriptPart("Her son is in remission now. I know because she sends me a Christmas card every year."),
+        ScriptPart("It started with a hundred dollars and became one of the most meaningful friendships of my life."),
+        ScriptPart("You never know what someone's carrying. A little kindness can change everything."),
+    ],
+    [
+        ScriptPart("My ex showed up to my wedding. I hadn't invited her."),
+        ScriptPart("She walked in during the cocktail hour wearing a white dress. My wife saw her first."),
+        ScriptPart("I thought there would be a scene. Instead, my wife walked over calmly."),
+        ScriptPart("She handed my ex a glass of champagne and said welcome to the party."),
+        ScriptPart("My ex looked confused. She had come to make a statement. My wife took the power right out of it."),
+        ScriptPart("She sat in the back during the ceremony. Nobody paid her any attention."),
+        ScriptPart("At the reception my groomsman Mark asked how she got past security."),
+        ScriptPart("Turns out she told them she was my cousin. They didn't check the list."),
+        ScriptPart("My wife danced with me like nothing happened. She smiled the entire night."),
+        ScriptPart("My ex left before the cake. She texted me the next morning and apologized."),
+        ScriptPart("She said my wife's kindness made her realize she'd been holding onto anger for no reason."),
+        ScriptPart("My wife never brought it up again. That's the moment I knew I had married exactly the right person."),
+        ScriptPart("We've been together nine years now. She still handles chaos better than anyone I know."),
+    ],
+    [
+        ScriptPart("I found a wallet with ten thousand dollars in it at the airport."),
+        ScriptPart("It was under a seat at gate B7, no ID, just cash and a handwritten note."),
+        ScriptPart("The note said: 'For Maria's surgery. Please God, let us make it in time.'"),
+        ScriptPart("I turned it in to the airline desk. They said they'd try to find the owner."),
+        ScriptPart("Two hours later, a man came running through the terminal in tears."),
+        ScriptPart("He grabbed the wallet and just stood there shaking. He couldn't speak for a full minute."),
+        ScriptPart("His daughter needed heart surgery in another city. This was every dollar they had."),
+        ScriptPart("He offered me money. I told him to keep every cent."),
+        ScriptPart("He asked for my address. I said just go take care of your daughter."),
+        ScriptPart("Six months later I got a package in the mail from across the country."),
+        ScriptPart("Inside was a drawing from a little girl named Maria. It said 'thank you for finding daddy's wallet.'"),
+        ScriptPart("There was a photo of her smiling in a hospital bed, post-surgery, giving a thumbs up."),
+        ScriptPart("I still have that drawing on my fridge. It reminds me that doing the right thing always matters."),
+    ],
+    [
+        ScriptPart("My Uber driver gave me the best advice I ever received in thirty minutes."),
+        ScriptPart("I had just walked out of a meeting where I got passed over for a promotion for the third time."),
+        ScriptPart("I got in the car angry, probably slammed the door. He didn't say anything for five blocks."),
+        ScriptPart("Then he said, you look like someone who just lost a fight they thought they'd win."),
+        ScriptPart("I laughed for the first time that day. I told him everything."),
+        ScriptPart("He said he used to be a VP at a tech company. Made six figures, had the corner office."),
+        ScriptPart("Then he realized he was building someone else's dream while his kids grew up without him."),
+        ScriptPart("He quit, started driving, and used the flexible hours to coach his son's baseball team."),
+        ScriptPart("He said the promotion I wanted would just mean more hours away from the things that matter."),
+        ScriptPart("He dropped me off and said one thing I'll never forget: stop climbing someone else's ladder."),
+        ScriptPart("I went home, updated my resume, and applied to a smaller company closer to home."),
+        ScriptPart("Got the job a month later. Less money, but I'm home for dinner every night now."),
+        ScriptPart("I never got that driver's name, but I think about him every time I pick my kids up from school."),
+    ],
+    [
+        ScriptPart("My grandma's house had a locked room nobody was allowed to enter."),
+        ScriptPart("She lived alone after grandpa died. We visited every Sunday for twenty years."),
+        ScriptPart("The room at the end of the hall was always locked. She said it was storage."),
+        ScriptPart("When she passed at ninety-one, we found the key taped under her nightstand."),
+        ScriptPart("Inside was a fully preserved art studio. Canvases everywhere, hundreds of paintings."),
+        ScriptPart("Landscapes, portraits, still lifes. They were incredible. Gallery-level work."),
+        ScriptPart("We had no idea she painted. Not one family member knew."),
+        ScriptPart("In the back we found a letter she'd written but never sent. It was addressed to an art school."),
+        ScriptPart("She had been accepted to a program in Paris in nineteen fifty-four."),
+        ScriptPart("My grandfather told her it wasn't practical. She never went."),
+        ScriptPart("She painted in secret for over fifty years. Every single canvas was dated."),
+        ScriptPart("We donated thirty paintings to the local gallery. They sold out in a week."),
+        ScriptPart("The proceeds funded an art scholarship in her name. She finally got her gallery show at ninety-one."),
+        ScriptPart("Some dreams don't die. They just wait in locked rooms for someone to find them."),
+    ],
+    [
+        ScriptPart("My coworker ate my lunch every day for two weeks. I set the perfect trap."),
+        ScriptPart("I started noticing my lunch bag was lighter when I went to the fridge at noon."),
+        ScriptPart("At first I thought I was imagining it. Then my entire sandwich disappeared on a Thursday."),
+        ScriptPart("I asked around. Everyone shrugged. So I got creative."),
+        ScriptPart("I made a beautiful-looking sandwich with Carolina Reaper hot sauce hidden under the lettuce."),
+        ScriptPart("I labeled it clearly with my name and put it right in the front of the fridge."),
+        ScriptPart("At twelve fifteen, I heard someone coughing violently in the break room."),
+        ScriptPart("It was Greg from accounting. Red face, watery eyes, milk running down his chin."),
+        ScriptPart("He looked at me and I looked at him. Nothing needed to be said."),
+        ScriptPart("He never apologized, but my lunches were never touched again."),
+        ScriptPart("The whole office figured out what happened within an hour."),
+        ScriptPart("Someone left a bottle of Tums on Greg's desk with a sticky note that said 'bon appetit.'"),
+        ScriptPart("Justice was served. Medium-rare, with a side of Carolina Reaper."),
+    ],
+    [
+        ScriptPart("A stranger paid for my groceries and it ruined me for three days."),
+        ScriptPart("I was at the self-checkout with sixty dollars worth of food and my card declined."),
+        ScriptPart("I tried three times. Same result. The line behind me was growing."),
+        ScriptPart("I started putting things back. The milk, the chicken, the cereal for my kids."),
+        ScriptPart("A woman behind me put her hand on my arm and said don't you dare put that back."),
+        ScriptPart("She swiped her card before I could argue. Sixty-two dollars and fourteen cents."),
+        ScriptPart("I tried to say thank you but my voice cracked and I just stood there."),
+        ScriptPart("She said she'd been exactly where I was two years ago. Someone did the same for her."),
+        ScriptPart("She told me to pass it on when I could. Then she walked out."),
+        ScriptPart("I sat in my car and cried for twenty minutes. Not from sadness. From being seen."),
+        ScriptPart("It took me three days to stop thinking about that woman at the checkout."),
+        ScriptPart("Last month I finally passed it on. A dad at Target with two kids and a maxed-out card."),
+        ScriptPart("The look on his face was the same one I had. The cycle keeps going."),
+    ],
+    [
+        ScriptPart("I discovered my neighbor had been secretly mowing my lawn for three years."),
+        ScriptPart("After my wife passed, I stopped caring about the yard. About most things, honestly."),
+        ScriptPart("But every Saturday morning the grass was somehow cut. I assumed the HOA did it."),
+        ScriptPart("Then one day I woke up early and saw Jim from next door pushing his mower across my yard."),
+        ScriptPart("He didn't know I was watching. He trimmed the edges, picked up sticks, even watered the flowers."),
+        ScriptPart("I confronted him on the porch. He said he noticed I wasn't coming outside anymore."),
+        ScriptPart("He said his dad went through the same thing after losing his mom. Nobody helped."),
+        ScriptPart("He decided he wasn't going to let that happen to me."),
+        ScriptPart("Three years. A hundred and fifty-six Saturdays. He never mentioned it once."),
+        ScriptPart("I invited him in for coffee that morning. We talked for four hours."),
+        ScriptPart("He told me about his dad, his divorce, his daughter in college."),
+        ScriptPart("I started mowing my own lawn again after that. But every other Saturday we do it together."),
+        ScriptPart("Some people don't wait to be asked. They just show up. Jim showed up for three years."),
+    ],
+    [
+        ScriptPart("My sister's DNA test revealed our dad wasn't her biological father."),
+        ScriptPart("She took it for fun. Ancestry, twenty-three and me, the whole thing."),
+        ScriptPart("The results came back with zero percent match to our dad's side of the family."),
+        ScriptPart("She called me panicking at eleven at night. I told her it had to be an error."),
+        ScriptPart("It wasn't. I took the same test. I matched our dad. She didn't."),
+        ScriptPart("We sat on this for two weeks before she decided to confront our mom."),
+        ScriptPart("Mom broke down at the kitchen table. She said it happened before the marriage."),
+        ScriptPart("She thought the timing worked out. She never told anyone."),
+        ScriptPart("Our dad was in the next room. He walked in and said he already knew."),
+        ScriptPart("He'd known since my sister was born. The blood types didn't match. He did the math."),
+        ScriptPart("He said he made a choice thirty years ago to be her father anyway."),
+        ScriptPart("My sister collapsed into his arms. Nobody in that kitchen had dry eyes."),
+        ScriptPart("DNA doesn't make a family. Showing up every single day does. Our dad proved that."),
+    ],
+    [
+        ScriptPart("I caught my Airbnb host watching me through a hidden camera."),
+        ScriptPart("It was supposed to be a quiet weekend getaway in the mountains."),
+        ScriptPart("Beautiful cabin, five stars, glowing reviews. Everything seemed perfect."),
+        ScriptPart("On the second night I noticed a tiny red light blinking inside the smoke detector."),
+        ScriptPart("I unscrewed it. Inside was a wireless camera pointed directly at the bed."),
+        ScriptPart("I checked every room. Found two more. One in the bathroom, one in the living room."),
+        ScriptPart("I didn't touch them. I took photos, packed my bags, and drove to the nearest police station."),
+        ScriptPart("The detective told me they'd had complaints about that property before but never proof."),
+        ScriptPart("My photos and the camera serial numbers were enough. They got a warrant within hours."),
+        ScriptPart("The host had recordings of over forty guests. Stored on an external drive in his garage."),
+        ScriptPart("He was arrested the next morning. It made the local news."),
+        ScriptPart("Airbnb refunded me and permanently banned the listing."),
+        ScriptPart("Now I check every smoke detector in every rental. Trust your instincts. That red light saved me."),
+    ],
+    [
+        ScriptPart("My son's imaginary friend turned out to be someone real."),
+        ScriptPart("He was four and kept talking about a man named George who lived in the walls."),
+        ScriptPart("We thought it was adorable until he started repeating things no four-year-old would know."),
+        ScriptPart("He said George told him the house used to have a blue kitchen. We had painted it white."),
+        ScriptPart("Under the paint was in fact blue wallpaper. We found it during a renovation."),
+        ScriptPart("I looked up the property records. The original owner's name was George Mitchell."),
+        ScriptPart("He lived here from nineteen forty-two to nineteen eighty-seven. He installed the blue kitchen."),
+        ScriptPart("My son described what George looked like. Short, bald, wore suspenders every day."),
+        ScriptPart("I found a photo in the county archive. It matched exactly."),
+        ScriptPart("I'm not a superstitious person, but I couldn't explain any of it."),
+        ScriptPart("My son stopped talking about George when we finished the renovation. Just like that."),
+        ScriptPart("He doesn't remember any of it now. He's twelve and thinks we're making it up."),
+        ScriptPart("But I kept that county archive photo. George Mitchell is still on my fridge."),
+    ],
+    [
+        ScriptPart("I quit my six-figure job to become a school janitor. Best decision ever."),
+        ScriptPart("I was a senior analyst at a consulting firm. Seventy-hour weeks, airport lounges, hotel beds."),
+        ScriptPart("My doctor said my blood pressure was borderline dangerous at thirty-nine."),
+        ScriptPart("My daughter asked me one morning who I was. She was three. She didn't recognize me."),
+        ScriptPart("That afternoon I typed my resignation letter. Two weeks notice, no negotiation."),
+        ScriptPart("Everyone thought I lost my mind. My parents stopped talking to me for a month."),
+        ScriptPart("The elementary school near our house had a janitor opening. I applied."),
+        ScriptPart("The pay was a quarter of what I made. The hours were six to two. Home by lunch."),
+        ScriptPart("First week, a kid spilled an entire tray of spaghetti and said sorry mister."),
+        ScriptPart("I cleaned it up and he gave me a high five. That felt better than any quarterly bonus."),
+        ScriptPart("I've been doing this for five years now. My blood pressure is normal. I know every kid's name."),
+        ScriptPart("My daughter runs to me every morning when I drop her off. She tells her friends that's my dad."),
+        ScriptPart("You can't put a price on being present. I tried. It cost me a hundred and forty thousand a year."),
+        ScriptPart("Worth every penny I didn't earn."),
+    ],
+    [
+        ScriptPart("My barber has been cutting my hair for twenty years. Last week he told me his secret."),
+        ScriptPart("Every two weeks like clockwork. Same chair, same cut, same small talk."),
+        ScriptPart("He never missed an appointment. Never took a vacation. I thought he just loved his work."),
+        ScriptPart("Last Tuesday he sat me down and said he was retiring. Then he told me why he never stopped."),
+        ScriptPart("Twenty years ago his son was diagnosed with a rare condition. Treatment wasn't covered."),
+        ScriptPart("He worked six days a week, twelve hours a day, for two decades to pay it off."),
+        ScriptPart("Every haircut went toward the debt. Every tip. Every holiday weekend he stayed open."),
+        ScriptPart("He made the last payment three months ago. His son is healthy, married, expecting a baby."),
+        ScriptPart("He showed me the zero balance statement. His hands were shaking."),
+        ScriptPart("I asked why he never told anyone. He said it wasn't anyone else's burden."),
+        ScriptPart("Every barber in that shop stood up and clapped when he hung up his scissors."),
+        ScriptPart("I left the biggest tip of my life that day. He tried to give it back. I wouldn't let him."),
+        ScriptPart("Some heroes don't wear capes. They wear aprons and hold scissors for twenty years."),
+    ],
+    [
+        ScriptPart("My kid got suspended for punching a bully. I took him out for ice cream."),
+        ScriptPart("The school called at ten AM saying my son hit another student in the cafeteria."),
+        ScriptPart("I drove there expecting the worst. The principal looked at me like I'd raised a criminal."),
+        ScriptPart("Then they played the security footage. A bigger kid had been shoving a girl in a wheelchair."),
+        ScriptPart("He knocked her lunch tray off the table and laughed when the food hit the floor."),
+        ScriptPart("My son walked over and told him to stop. The kid shoved my son. My son shoved back."),
+        ScriptPart("One punch. The bully went down. Three teachers rushed over."),
+        ScriptPart("They suspended my son for three days. Zero tolerance policy. The bully got the same."),
+        ScriptPart("I looked at the principal and said so protecting someone in a wheelchair is the same as bullying."),
+        ScriptPart("She said rules are rules. I signed the paperwork and walked out without another word."),
+        ScriptPart("On the drive home my son asked if I was mad. I said we're getting ice cream."),
+        ScriptPart("He lit up like it was Christmas morning. We talked about right and wrong over chocolate sundaes."),
+        ScriptPart("The girl's mom called me that evening. She was in tears thanking my son."),
+        ScriptPart("He's twelve and already braver than most adults I know."),
+    ],
 ]
 
 _FALLBACK_METADATA_POOL = [
@@ -665,31 +925,141 @@ _FALLBACK_METADATA_POOL = [
         description="I quit my job, spent everything, and said goodbye. Then the phone rang.\nThe mix-up that changed my entire life.\n\n#shorts #reddit #redditstories #storytime #hospital #medical #mixup #viral #lifelesson #secondchance\n\nFollow for a new Reddit story every day! 🔔",
         tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "hospital", "medical", "misdiagnosis", "second chance", "life lesson"],
     ),
+    # ── Metadata for stories 9-25 ──
+    VideoMetadata(
+        title="My Landlord Tried to Evict Me for His Own Cat 🐱 #shorts",
+        description="He taped an eviction notice on my door with a blurry photo. Turns out it was HIS cat.\nThe housing authority had a field day.\n\n#shorts #reddit #redditstories #storytime #landlord #karma #eviction #viral #drama #cat\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "landlord", "eviction", "karma", "cat", "tenant rights", "housing"],
+    ),
+    VideoMetadata(
+        title="I Accidentally Sent My Boss a Rant About Him 💀 #shorts",
+        description="Three paragraphs about his micromanagement. Sent to HIM instead of my friend.\nWhat happened next changed everything.\n\n#shorts #reddit #redditstories #storytime #boss #workplace #awkward #viral #email #office\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "boss", "workplace", "awkward moment", "email fail", "office drama", "plot twist"],
+    ),
+    VideoMetadata(
+        title="My Kid's Drawing Almost Got Me Investigated 🔥 #shorts",
+        description="The school called me in about my daughter's art. 'Daddy's work' showed a man in fire.\nI'm a firefighter. She drew me at work.\n\n#shorts #reddit #redditstories #storytime #firefighter #school #misunderstanding #viral #kids #funny\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "firefighter", "school", "misunderstanding", "kids", "funny", "parent"],
+    ),
+    VideoMetadata(
+        title="I Tipped $100 and Got This Letter a Week Later 💌 #shorts",
+        description="She got my order wrong twice and looked like she'd been crying. I left a hundred dollars.\nWhat she wrote back destroyed me.\n\n#shorts #reddit #redditstories #storytime #kindness #tip #waitress #viral #heartwarming #karma\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "kindness", "tip", "waitress", "heartwarming", "generosity", "karma"],
+    ),
+    VideoMetadata(
+        title="My Ex Showed Up to My Wedding in White 👰 #shorts",
+        description="She wasn't invited. She wore white. My wife handled it like a legend.\nThis wedding story is absolutely wild.\n\n#shorts #reddit #redditstories #storytime #wedding #ex #drama #viral #wife #class\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "wedding", "ex", "drama", "wife", "class act", "uninvited guest"],
+    ),
+    VideoMetadata(
+        title="I Found a Wallet With $10K and a Desperate Note 💰 #shorts",
+        description="Under a seat at the airport. No ID, just cash and a note about a little girl's surgery.\nWhat happened when the owner came back broke me.\n\n#shorts #reddit #redditstories #storytime #honesty #airport #viral #heartwarming #found\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "honesty", "airport", "found wallet", "heartwarming", "surgery", "good deed"],
+    ),
+    VideoMetadata(
+        title="My Uber Driver Gave Me Life-Changing Advice 🚗 #shorts",
+        description="I got passed over for promotion. He used to be a VP making six figures.\nHis advice: stop climbing someone else's ladder.\n\n#shorts #reddit #redditstories #storytime #advice #uber #career #viral #lifelesson #wisdom\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "uber driver", "advice", "career change", "life lesson", "wisdom", "inspiration"],
+    ),
+    VideoMetadata(
+        title="Grandma's Locked Room Held a 50-Year Secret 🎨 #shorts",
+        description="She said it was storage. After she passed, we found the key.\nHundreds of paintings. She'd been an artist her whole life and nobody knew.\n\n#shorts #reddit #redditstories #storytime #grandma #secret #art #viral #family #emotional\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "grandma", "secret", "art", "family", "emotional", "hidden talent", "paintings"],
+    ),
+    VideoMetadata(
+        title="The Lunch Thief Picked the Wrong Sandwich 🌶️ #shorts",
+        description="Someone ate my lunch every day for two weeks. I filled a sandwich with Carolina Reaper.\nGreg from accounting learned his lesson.\n\n#shorts #reddit #redditstories #storytime #lunchthief #revenge #office #viral #karma #spicy\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "lunch thief", "revenge", "office", "karma", "spicy", "carolina reaper", "coworker"],
+    ),
+    VideoMetadata(
+        title="A Stranger Paid for My Groceries. I Cried in My Car 🛒 #shorts",
+        description="My card declined. I started putting things back. Then a woman behind me swiped her card.\nShe'd been exactly where I was two years ago.\n\n#shorts #reddit #redditstories #storytime #kindness #groceries #payitforward #viral #emotional\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "kindness", "groceries", "pay it forward", "emotional", "stranger", "generosity"],
+    ),
+    VideoMetadata(
+        title="My Neighbor Secretly Mowed My Lawn for 3 Years 🏡 #shorts",
+        description="After my wife passed, I stopped caring about the yard. Jim from next door noticed.\n156 Saturdays. He never said a word.\n\n#shorts #reddit #redditstories #storytime #neighbor #kindness #grief #viral #wholesome #friendship\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "neighbor", "kindness", "grief", "wholesome", "friendship", "lawn", "helping"],
+    ),
+    VideoMetadata(
+        title="A DNA Test Revealed My Dad's 30-Year Secret 🧬 #shorts",
+        description="My sister's results showed zero match to our dad. We confronted our mom.\nThen dad walked in and said he already knew.\n\n#shorts #reddit #redditstories #storytime #dna #family #secret #viral #emotional #twist\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "DNA test", "family secret", "emotional", "twist", "father", "adoption"],
+    ),
+    VideoMetadata(
+        title="I Found Hidden Cameras in My Airbnb 📷 #shorts",
+        description="Beautiful cabin, five stars. Then I noticed a red light in the smoke detector.\nThree cameras. Forty victims. One arrest.\n\n#shorts #reddit #redditstories #storytime #airbnb #camera #creepy #viral #safety #crime\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "Airbnb", "hidden camera", "creepy", "safety", "crime", "travel"],
+    ),
+    VideoMetadata(
+        title="My Son's Imaginary Friend Was a Real Person 👻 #shorts",
+        description="He said George lived in the walls. He described things only the original owner would know.\nThe county archive photo matched exactly.\n\n#shorts #reddit #redditstories #storytime #paranormal #creepy #kids #viral #ghost #mystery\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "paranormal", "creepy", "imaginary friend", "ghost", "kids", "mystery", "haunted house"],
+    ),
+    VideoMetadata(
+        title="I Quit My 6-Figure Job to Be a Janitor. Zero Regrets 🧹 #shorts",
+        description="My three-year-old didn't recognize me. That afternoon I quit.\nNow I'm home by lunch every day. Worth every penny I didn't earn.\n\n#shorts #reddit #redditstories #storytime #career #quit #family #viral #lifelesson #priorities\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "career change", "quit job", "family", "janitor", "life lesson", "priorities"],
+    ),
+    VideoMetadata(
+        title="My Barber's 20-Year Secret Made the Whole Shop Cry ✂️ #shorts",
+        description="He never took a vacation in 20 years. Every haircut went to one thing.\nWhen he finally told us why, everyone stood up and clapped.\n\n#shorts #reddit #redditstories #storytime #barber #sacrifice #family #viral #emotional #hero\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "barber", "sacrifice", "family", "emotional", "hero", "dedication"],
+    ),
+    VideoMetadata(
+        title="My Son Punched a Bully. I Took Him for Ice Cream 🍦 #shorts",
+        description="He defended a girl in a wheelchair. The school suspended him.\nI signed the paperwork and drove straight to the ice cream shop.\n\n#shorts #reddit #redditstories #storytime #bully #hero #school #viral #parenting #courage\n\nFollow for a new Reddit story every day! 🔔",
+        tags=["reddit", "reddit stories", "storytime", "shorts", "reddit storytime", "story time", "true story", "viral", "best reddit stories", "bully", "standing up", "school", "parenting", "courage", "hero", "wheelchair"],
+    ),
 ]
 
 
+USED_FALLBACKS_PATH = Path("used_fallbacks.json")
+
+
+def _load_used_fallback_indices() -> list:
+    """Load list of previously used fallback pool indices."""
+    if USED_FALLBACKS_PATH.is_file():
+        try:
+            return json.loads(USED_FALLBACKS_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+
+def _save_used_fallback_index(idx: int) -> None:
+    """Append fallback index to used list."""
+    used = _load_used_fallback_indices()
+    used.append(idx)
+    USED_FALLBACKS_PATH.write_text(json.dumps(used, ensure_ascii=False), encoding="utf-8")
+
+
 def _fallback_script(recent_titles: list = None) -> tuple:
-    """Pick a fallback script, avoiding titles already on the channel."""
+    """Pick a fallback script, avoiding already-used stories."""
     all_titles = list(recent_titles or []) + _load_title_history()
-    # Try each story in random order, skip if title already used
+    used_indices = set(_load_used_fallback_indices())
+
+    # Try each story in random order, skip if index already used OR title too similar
     order = list(range(len(_FALLBACK_POOL)))
     random.shuffle(order)
     for idx in order:
+        if idx in used_indices:
+            continue
         meta = _FALLBACK_METADATA_POOL[idx]
         if all_titles and any(_title_similarity(meta.title, t) > 0.5 for t in all_titles):
             continue
+        _save_used_fallback_index(idx)
         _save_title_to_history(meta.title)
         return list(_FALLBACK_POOL[idx]), meta
-    # All fallbacks used — pick random but randomize the title emoji to reduce exact-match dupes
-    idx = random.randrange(len(_FALLBACK_POOL))
+
+    # All fallbacks exhausted — reset tracker and pick least-recently used
+    print("[WARN] All fallback stories exhausted, resetting fallback tracker")
+    USED_FALLBACKS_PATH.write_text("[]", encoding="utf-8")
+    idx = order[0]
     meta = _FALLBACK_METADATA_POOL[idx]
-    emoji_pool = ["😱", "🔥", "💀", "😤", "🤯", "💔", "⚡", "👀", "🚨", "📱", "🏠", "💰"]
-    # Strip existing emoji and add a new random one
-    clean_title = re.sub(r'[\U0001f300-\U0001f9ff]', '', meta.title).strip()
-    new_title = f"{clean_title} {random.choice(emoji_pool)} #shorts"[:100]
-    new_meta = VideoMetadata(title=new_title, description=meta.description, tags=meta.tags)
-    _save_title_to_history(new_meta.title)
-    return list(_FALLBACK_POOL[idx]), new_meta
+    _save_used_fallback_index(idx)
+    _save_title_to_history(meta.title)
+    return list(_FALLBACK_POOL[idx]), meta
 
 
 def _load_title_history() -> list:
@@ -756,12 +1126,27 @@ def _enrich_metadata(meta: VideoMetadata) -> VideoMetadata:
     return VideoMetadata(title=title, description=desc, tags=tags)
 
 
-def call_groq_for_script(recent_titles: list = None) -> tuple:
-    api_key = os.getenv("GROQ_API_KEY")
-    if not api_key:
-        print("[WARN] GROQ_API_KEY not set — using fallback script")
-        return _fallback_script(recent_titles)
+_STORY_SYSTEM_PROMPT = (
+    "You are a master storyteller who writes viral Reddit-style stories for YouTube Shorts. "
+    "Your stories are COMPLETE narratives with a clear beginning, rising tension, a twist or climax, and a SATISFYING ending. "
+    "Every story must feel FINISHED — the listener should feel closure, not like it was cut short. "
+    "Write in first person as if telling a true personal experience. "
+    "Use vivid details, specific names, times, places to make the story feel real. "
+    "Build suspense naturally — each sentence should make the listener NEED to hear the next one. "
+    "The ending must deliver: either justice, karma, a twist reveal, an emotional payoff, or a powerful life lesson. "
+    "NEVER use filler phrases like 'you won't believe' or 'wait for it'. SHOW, don't tell. "
+    "Use NARRATIVE TRANSITIONS to move the story forward — words and phrases like: "
+    "'but then', 'suddenly', 'turned out', 'realized', 'discovered', 'finally', "
+    "'that's when', 'never expected', 'the truth was', 'everything changed', "
+    "'couldn't believe', 'noticed', 'decided', 'told', 'found out', 'knew', "
+    "'walked away', 'confronted', 'admitted', 'it hit me', 'at that moment'. "
+    "At least a third of your sentences should contain such narrative progression markers. "
+    "Respond ONLY with valid JSON, no markdown wrappers or explanations."
+)
 
+
+def _pick_story_params():
+    """Pick random story parameters for LLM prompt."""
     from analytics import get_topic_weights
     weights = get_topic_weights(STORY_GENRES)
     if weights:
@@ -773,7 +1158,6 @@ def call_groq_for_script(recent_titles: list = None) -> tuple:
     character = random.choice(STORY_CHARACTERS)
     setting = random.choice(STORY_SETTINGS)
 
-    # Try Reddit for a unique real premise; fall back to static list
     reddit_premise = fetch_reddit_premise()
     if reddit_premise:
         premise = reddit_premise
@@ -782,31 +1166,12 @@ def call_groq_for_script(recent_titles: list = None) -> tuple:
         premise = random.choice(STORY_PREMISES)
         print(f"  Using static premise: {premise[:100]}...")
 
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-    }
+    return genre, hook, tone, character, setting, premise
 
-    system_prompt = (
-        "You are a master storyteller who writes viral Reddit-style stories for YouTube Shorts. "
-        "Your stories are COMPLETE narratives with a clear beginning, rising tension, a twist or climax, and a SATISFYING ending. "
-        "Every story must feel FINISHED — the listener should feel closure, not like it was cut short. "
-        "Write in first person as if telling a true personal experience. "
-        "Use vivid details, specific names, times, places to make the story feel real. "
-        "Build suspense naturally — each sentence should make the listener NEED to hear the next one. "
-        "The ending must deliver: either justice, karma, a twist reveal, an emotional payoff, or a powerful life lesson. "
-        "NEVER use filler phrases like 'you won't believe' or 'wait for it'. SHOW, don't tell. "
-        "Use NARRATIVE TRANSITIONS to move the story forward — words and phrases like: "
-        "'but then', 'suddenly', 'turned out', 'realized', 'discovered', 'finally', "
-        "'that's when', 'never expected', 'the truth was', 'everything changed', "
-        "'couldn't believe', 'noticed', 'decided', 'told', 'found out', 'knew', "
-        "'walked away', 'confronted', 'admitted', 'it hit me', 'at that moment'. "
-        "At least a third of your sentences should contain such narrative progression markers. "
-        "Respond ONLY with valid JSON, no markdown wrappers or explanations."
-    )
 
-    user_prompt = f"""Write a complete Reddit-style story for YouTube Shorts (60–90 seconds when read aloud).
+def _build_user_prompt(genre, hook, tone, character, setting, premise):
+    """Build the user prompt for story generation."""
+    return f"""Write a complete Reddit-style story for YouTube Shorts (60–90 seconds when read aloud).
 
 STORY PARAMETERS:
 - Genre: {genre}
@@ -853,6 +1218,104 @@ Format — strictly JSON:
   ]
 }}"""
 
+
+# Global for LLM-generated Pexels queries
+_llm_pexels_queries: List[str] = []
+
+
+def _parse_llm_response(content: str, genre: str, recent_titles: list = None):
+    """Parse LLM JSON response into (parts, metadata) or None."""
+    global _llm_pexels_queries
+    content = re.sub(r"^```(?:json)?\s*", "", content.strip())
+    content = re.sub(r"\s*```$", "", content.strip())
+    data = json.loads(content)
+    parts = [ScriptPart(p["text"]) for p in data.get("parts", []) if p.get("text")]
+    metadata = VideoMetadata(
+        title=data.get("title", "")[:100] or "A Story You Won't Forget #shorts",
+        description=data.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
+        tags=data.get("tags", ["reddit", "storytime", "shorts"]),
+        topic=genre,
+    )
+    metadata = _enrich_metadata(metadata)
+    llm_queries = data.get("pexels_queries", [])
+    if llm_queries:
+        _llm_pexels_queries = [q for q in llm_queries if isinstance(q, str)][:6]
+
+    if not _validate_script(parts):
+        return None
+
+    all_titles = list(recent_titles or []) + _load_title_history()
+    if all_titles and any(_title_similarity(metadata.title, t) > 0.5 for t in all_titles):
+        print(f"[WARN] Title too similar to existing: {metadata.title}")
+        return None
+
+    _save_title_to_history(metadata.title)
+    return parts, metadata
+
+
+def _call_gemini_for_script(recent_titles: list = None):
+    """Try generating a script using Gemini 2.0 Flash as fallback LLM."""
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        print("[GEMINI] GEMINI_API_KEY not set, skipping")
+        return None
+
+    genre, hook, tone, character, setting, premise = _pick_story_params()
+    user_prompt = _build_user_prompt(genre, hook, tone, character, setting, premise)
+
+    print(f"  [GEMINI] Trying Gemini 2.0 Flash...")
+    print(f"  Genre: {genre}")
+    print(f"  Character: {character}")
+    print(f"  Setting: {setting}")
+
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+    body = {
+        "contents": [{"parts": [{"text": user_prompt}]}],
+        "systemInstruction": {"parts": [{"text": _STORY_SYSTEM_PROMPT}]},
+        "generationConfig": {"temperature": 0.9, "maxOutputTokens": 3000},
+    }
+
+    for attempt in range(2):
+        try:
+            resp = requests.post(url, json=body, timeout=60)
+            resp.raise_for_status()
+            raw = resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+            result = _parse_llm_response(raw, genre, recent_titles)
+            if result:
+                print(f"  [GEMINI] Success on attempt {attempt + 1}")
+                return result
+            print(f"  [GEMINI] Attempt {attempt + 1} failed validation, retrying...")
+            # Rebuild with fresh params for retry
+            if attempt == 0:
+                genre, hook, tone, character, setting, premise = _pick_story_params()
+                user_prompt = _build_user_prompt(genre, hook, tone, character, setting, premise)
+                body["contents"][0]["parts"][0]["text"] = user_prompt
+                body["generationConfig"]["temperature"] = 1.0
+        except Exception as exc:
+            print(f"  [GEMINI] Attempt {attempt + 1} failed: {exc}")
+
+    print("[GEMINI] All attempts failed")
+    return None
+
+
+def call_groq_for_script(recent_titles: list = None) -> tuple:
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        print("[WARN] GROQ_API_KEY not set — trying Gemini...")
+        result = _call_gemini_for_script(recent_titles)
+        if result:
+            return result
+        return _fallback_script(recent_titles)
+
+    genre, hook, tone, character, setting, premise = _pick_story_params()
+    user_prompt = _build_user_prompt(genre, hook, tone, character, setting, premise)
+
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    }
+
     print(f"  Genre: {genre}")
     print(f"  Character: {character}")
     print(f"  Setting: {setting}")
@@ -863,7 +1326,7 @@ Format — strictly JSON:
     body = {
         "model": "llama-3.3-70b-versatile",
         "messages": [
-            {"role": "system", "content": system_prompt},
+            {"role": "system", "content": _STORY_SYSTEM_PROMPT},
             {"role": "user", "content": user_prompt},
         ],
         "temperature": 0.9,
@@ -878,79 +1341,42 @@ Format — strictly JSON:
             resp = requests.post(url, headers=headers, json=body, timeout=60)
             resp.raise_for_status()
         except Exception as exc2:
-            print(f"[WARN] Groq API attempt 2 failed: {exc2}, using fallback")
+            print(f"[WARN] Groq API attempt 2 failed: {exc2}, trying Gemini...")
+            result = _call_gemini_for_script(recent_titles)
+            if result:
+                return result
             return _fallback_script(recent_titles)
 
     try:
         content = resp.json()["choices"][0]["message"]["content"]
-        content = re.sub(r"^```(?:json)?\s*", "", content.strip())
-        content = re.sub(r"\s*```$", "", content.strip())
-        data = json.loads(content)
-        parts = [ScriptPart(p["text"]) for p in data.get("parts", []) if p.get("text")]
-        metadata = VideoMetadata(
-            title=data.get("title", "")[:100] or "A Story You Won't Forget #shorts",
-            description=data.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
-            tags=data.get("tags", ["reddit", "storytime", "shorts"]),
-            topic=genre,
-        )
-        metadata = _enrich_metadata(metadata)
-        # Save LLM-generated Pexels queries
-        llm_queries = data.get("pexels_queries", [])
-        if llm_queries:
-            global _llm_pexels_queries
-            _llm_pexels_queries = [q for q in llm_queries if isinstance(q, str)][:6]
-
-        if _validate_script(parts):
-            all_titles = list(recent_titles or []) + _load_title_history()
-            is_dupe = any(_title_similarity(metadata.title, t) > 0.5 for t in all_titles)
-            if is_dupe:
-                print(f"[WARN] Title too similar to existing, retrying...")
-            else:
-                _save_title_to_history(metadata.title)
-                return parts, metadata
-        else:
-            print("[WARN] LLM output failed quality check, retrying with fresh prompt...")
+        result = _parse_llm_response(content, genre, recent_titles)
+        if result:
+            return result
+        print("[WARN] Groq output failed validation, retrying with fresh prompt...")
     except Exception as exc:
         print(f"[WARN] Groq parse error, retrying: {exc}")
 
     # ── Retry once with a fresh random seed ──
-    body["messages"][1]["content"] = body["messages"][1]["content"] + "\n\nIMPORTANT: Use more narrative transition words like 'realized', 'discovered', 'turned out', 'finally', 'suddenly', 'that's when', 'noticed', 'decided', 'found out'. At least 30% of parts MUST contain such words."
+    body["messages"][1]["content"] = user_prompt + "\n\nIMPORTANT: Use more narrative transition words like 'realized', 'discovered', 'turned out', 'finally', 'suddenly', 'that's when', 'noticed', 'decided', 'found out'. At least 30% of parts MUST contain such words."
     body["temperature"] = 1.0
     try:
         resp2 = requests.post(url, headers=headers, json=body, timeout=60)
         resp2.raise_for_status()
         content2 = resp2.json()["choices"][0]["message"]["content"]
-        content2 = re.sub(r"^```(?:json)?\s*", "", content2.strip())
-        content2 = re.sub(r"\s*```$", "", content2.strip())
-        data2 = json.loads(content2)
-        parts2 = [ScriptPart(p["text"]) for p in data2.get("parts", []) if p.get("text")]
-        metadata2 = VideoMetadata(
-            title=data2.get("title", "")[:100] or "A Story You Won't Forget #shorts",
-            description=data2.get("description", "") or "This story has a twist you didn't see coming!\n\n#reddit #storytime #shorts",
-            tags=data2.get("tags", ["reddit", "storytime", "shorts"]),
-            topic=genre,
-        )
-        metadata2 = _enrich_metadata(metadata2)
-        llm_queries2 = data2.get("pexels_queries", [])
-        if llm_queries2:
-            _llm_pexels_queries = [q for q in llm_queries2 if isinstance(q, str)][:6]
-        if _validate_script(parts2):
-            all_titles2 = list(recent_titles or []) + _load_title_history()
-            is_dupe2 = any(_title_similarity(metadata2.title, t) > 0.5 for t in all_titles2)
-            if is_dupe2:
-                print(f"[WARN] Retry title also too similar, using fallback")
-            else:
-                _save_title_to_history(metadata2.title)
-                return parts2, metadata2
-        print("[WARN] Retry also failed quality check, using fallback")
+        result2 = _parse_llm_response(content2, genre, recent_titles)
+        if result2:
+            return result2
+        print("[WARN] Groq retry also failed validation")
     except Exception as exc:
-        print(f"[WARN] Retry failed: {exc}, using fallback")
+        print(f"[WARN] Groq retry failed: {exc}")
+
+    # ── Try Gemini before falling back to static pool ──
+    print("[INFO] Groq exhausted, trying Gemini...")
+    gemini_result = _call_gemini_for_script(recent_titles)
+    if gemini_result:
+        return gemini_result
 
     return _fallback_script(recent_titles)
-
-
-# Global for LLM-generated Pexels queries
-_llm_pexels_queries: List[str] = []
 
 
 # ── Download clips ─────────────────────────────────────────────────────
