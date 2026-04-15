@@ -138,7 +138,11 @@ REDDIT_SUBREDDITS = [
     "neighborsfromhell", "BestofRedditorUpdates",
 ]
 
-REDDIT_USER_AGENT = "Mozilla/5.0 (compatible; StoryBot/1.0)"
+REDDIT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json",
+    "Accept-Language": "en-US,en;q=0.9",
+}
 
 
 def _load_used_stories() -> list:
@@ -174,16 +178,21 @@ def fetch_reddit_stories(count: int = 5) -> list[str]:
         for time_filter in ["week", "month", "year"]:
             if len(premises) >= count:
                 break
-            url = f"https://www.reddit.com/r/{sub}/top/.json?t={time_filter}&limit=50"
+            url = f"https://old.reddit.com/r/{sub}/top/.json?t={time_filter}&limit=50"
             try:
+                time.sleep(random.uniform(1.5, 3.5))
                 resp = requests.get(
                     url,
-                    headers={"User-Agent": REDDIT_USER_AGENT},
+                    headers=REDDIT_HEADERS,
                     timeout=15,
                 )
                 if resp.status_code == 429:
-                    print(f"[REDDIT] Rate limited on r/{sub}, trying next...")
+                    print(f"[REDDIT] Rate limited on r/{sub}, sleeping...")
+                    time.sleep(10)
                     break
+                if resp.status_code == 403:
+                    print(f"[REDDIT] Blocked r/{sub}/{time_filter}, trying next...")
+                    continue
                 resp.raise_for_status()
                 data = resp.json()
                 posts = data.get("data", {}).get("children", [])
@@ -255,11 +264,19 @@ def _groq_call(messages: list, temperature: float = 0.85, max_tokens: int = 8192
     }
     if json_mode:
         body["response_format"] = {"type": "json_object"}
-    for attempt in range(1, 3):
+    for attempt in range(1, 6):
         try:
             r = requests.post(GROQ_URL, headers=headers, json=body, timeout=90)
             r.raise_for_status()
             return r.json()["choices"][0]["message"]["content"]
+        except requests.exceptions.HTTPError as exc:
+            if r.status_code == 429:
+                wait = min(10 * (2 ** (attempt - 1)), 120)
+                print(f"[WARN] Groq attempt {attempt}: 429 rate limited, waiting {wait}s...")
+                time.sleep(wait)
+            else:
+                print(f"[WARN] Groq attempt {attempt}: {exc}")
+                time.sleep(5)
         except Exception as exc:
             print(f"[WARN] Groq attempt {attempt}: {exc}")
             time.sleep(5)
